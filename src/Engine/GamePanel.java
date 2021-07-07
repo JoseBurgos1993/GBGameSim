@@ -20,7 +20,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 	// Panel Attributes \\
 	public  static int WIDTH = 160;
 	public  static int HEIGHT = 144;
-	public  static int MAGNIFICATION = 1;
+	public  static int MAGNIFICATION = 4;
 	private Thread thread;
 	private boolean running;
 	private long targetTime;
@@ -36,8 +36,8 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 	private int     chosenPallete  = 0;
 	
 	// Layers \\
-	private int cameraOffsetX = 0;
-	private int cameraOffsetY = 0;
+	private int cameraOffsetX = -8; // Default is 8. Should go from -1 to -15.
+	private int cameraOffsetY = -8; // Default is 8. Should go from -1 to -15.
 	private int cameraPosX = 0;
 	private int cameraPosY = 0;
 	private Tile   tileSet[]         = new Tile[256];   // The tileset that the game uses. I'll figure it out later. The elements in the int layers refer to a tile in this array.
@@ -84,7 +84,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 			elapsed = System.nanoTime() - startTime;
 			wait = targetTime - elapsed / 1000000;
 			if(frame_count == FRAME_RATE) {
-				System.out.println("Time Used = " + elapsed / 1000000 + "/" + targetTime);
+				//System.out.println("Time Used = " + elapsed / 1000000 + "/" + targetTime);
 				frame_count = 0;
 			}
 			/////////\\\\\\\\
@@ -171,21 +171,6 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 		 * 
 		 */
 		
-		// render tile test \\
-		int x = cameraOffsetX;
-		int y = cameraOffsetY;
-		for(int i = 0; i < BackgroundLayer.length; i++) {
-			drawTile(i,BackgroundLayer[i],x,y,g2d);
-			
-			x+=8;
-			if(x>159) {
-				x = cameraOffsetX;
-				y+=8;
-			}
-		}
-		
-		
-		///////////\\\\\\\\\\\
 		
 		
 		//g2d.clearRect(0, 0, WIDTH*MAGNIFICATION, HEIGHT*MAGNIFICATION);
@@ -245,9 +230,23 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 			g2d.drawRect((i % WIDTH) * MAGNIFICATION, ((int)(i / WIDTH)) * MAGNIFICATION, MAGNIFICATION - 1, MAGNIFICATION - 1);
 		}
 		*/
+
+		// render tile test \\
+		int x = cameraOffsetX;
+		int y = cameraOffsetY;
+		for(int i = 0; i < BackgroundLayer.length; i++) {
+			drawTile(BackgroundLayer[i],x,y,g2d);
+			
+			x+=8;
+			if(x>159) {
+				x = cameraOffsetX;
+				y+=8;
+			}
+		}
+		///////////\\\\\\\\\\\
 	}
 	
-	private void drawTile(int index, int tileNum, int x, int y, Graphics2D g2d) {
+	private void drawTile(int tileNum, int x, int y, Graphics2D g2d) {
 		int tile[] = tileSet[tileNum].getTile();
 		int tileX, tileY = 0;
 		int xOffset = 0;
@@ -257,13 +256,13 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 			yOffset = (int)i/8;
 			tileX = x+xOffset;
 			tileY = y+yOffset;
-			if(tileX < 0 || tileY < 0 || tileX > WIDTH - 1 || tileY > HEIGHT - 1) {
-				continue;
-			}
+			
+			//if(tileX < 0 || tileY < 0 || tileX > 160 - 1 || tileY > 144 - 1) {
+			//	continue;
+			//}
 			
 			g2d.setColor(colorPallete[tile[i]]);
 			g2d.fillRect(tileX * MAGNIFICATION, tileY * MAGNIFICATION, MAGNIFICATION, MAGNIFICATION);
-			//g2d.drawRect(tileX * MAGNIFICATION, tileY * MAGNIFICATION, MAGNIFICATION - 1, MAGNIFICATION - 1);
 		}
 	}
 	
@@ -273,16 +272,28 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 		int key = e.getKeyCode();
 		buttonPress = true;
 		if(key == KeyEvent.VK_UP) {
-			cameraOffsetY--;
+			cameraOffsetY++;
+			if(cameraOffsetY>-1) {
+				cameraOffsetY = -1;
+			}
 		}
 		if(key == KeyEvent.VK_DOWN) {
-			cameraOffsetY++;
+			cameraOffsetY--;
+			if(cameraOffsetY<-15) {
+				cameraOffsetY = -15;
+			}
 		}
 		if(key == KeyEvent.VK_LEFT) {
-			cameraOffsetX--;
+			cameraOffsetX++;
+			if(cameraOffsetX>-1) {
+				cameraOffsetX = -1;
+			}
 		}
 		if(key == KeyEvent.VK_RIGHT) {
-			cameraOffsetX++;
+			cameraOffsetX--;
+			if(cameraOffsetX<-15) {
+				cameraOffsetX = -15;
+			}
 		}
 	}
 	@Override
