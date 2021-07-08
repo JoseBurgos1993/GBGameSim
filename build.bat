@@ -1,0 +1,4 @@
+:: COMPILES THE PROGRAM BY RUNNING THE MAKEFILE UNDER THE "SRC" DIRECTORY
+@ECHO OFF
+cd src
+gmake --makefile .\makefile
