@@ -50,6 +50,9 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 	public static Graphics2D g2d;
 	private BufferedImage image;
 	
+	// User Controls \\
+	private boolean controls[] = new boolean[] {false,false,false,false};
+	
 	public GamePanel() {
 		setPreferredSize(new Dimension(WIDTH*MAGNIFICATION, HEIGHT*MAGNIFICATION));
 		setFocusable(true);
@@ -118,8 +121,9 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 	}
 	
 	private void createTestGameTiles() {
+		// Creates Background Tile (the smiley face)
 		int tile1[] = new int[64];
-		Arrays.fill(tile1, 1);
+		Arrays.fill(tile1, 1); // Default filling the array with dark grey pixels. Followed by filling in specific elements with the colors to make the face.
 		tile1[10] = 3;
 		tile1[13] = 3;
 		tile1[18] = 3;
@@ -131,33 +135,53 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 		tile1[45] = 0;
 		tile1[51] = 0;
 		tile1[52] = 0;
-		tileSet[0] = new Tile(tile1);
-		Arrays.fill(BackgroundLayer, 0);
+		tileSet[0] = new Tile(tile1); // Adds this tile to the tileSet for the system
+		Arrays.fill(BackgroundLayer, 0); // Fills the whole background layer with this tile.
 		
+		// Creating pokemon boy. First 4 lines create 4 tiles with the appropriate colors.
 		int pokTile0[] = new int[] {4,4,4,4,4,0,0,0,  4,4,4,4,0,1,1,1,  4,4,4,0,1,1,1,1,  4,4,4,0,1,1,1,1,  4,4,0,0,0,1,2,2,  4,4,0,0,1,0,0,0,  4,0,2,0,2,2,2,2,  4,0,2,2,2,2,0,2};
 		int pokTile1[] = new int[] {0,0,0,4,4,4,4,4,  1,1,1,0,4,4,4,4,  1,1,1,1,0,4,4,4,  1,1,1,1,0,4,4,4,  2,2,1,0,0,0,4,4,  0,0,0,1,0,0,4,4,  2,2,2,2,0,2,0,4,  2,0,2,2,2,2,0,4};
 		int pokTile2[] = new int[] {4,4,0,0,2,2,0,2,  4,4,0,0,0,2,2,1,  4,0,2,2,0,0,0,0,  4,0,2,2,0,0,0,0,  4,4,0,0,0,1,1,0,  4,4,4,0,1,0,0,1,  4,4,4,0,1,1,1,0,  4,4,4,4,0,0,0,4};
 		int pokTile3[] = new int[] {2,0,2,2,0,0,4,4,  1,2,2,0,0,0,4,4,  0,0,0,0,2,2,0,4,  0,0,0,0,2,2,0,4,  0,1,1,0,0,0,4,4,  1,0,0,1,0,4,4,4,  0,1,1,1,0,4,4,4,  4,0,0,0,4,4,4,4};
 		
-		Tile pokTile00 = new Tile(pokTile0);
-		Tile pokTile01 = new Tile(pokTile1);
-		Tile pokTile02 = new Tile(pokTile2);
-		Tile pokTile03 = new Tile(pokTile3);
+		// Adds these tiles to the tileSet
+		tileSet[1] = new Tile(pokTile0);
+		tileSet[2] = new Tile(pokTile1);
+		tileSet[3] = new Tile(pokTile2);
+		tileSet[4] = new Tile(pokTile3);
 		
-		tileSet[1] = pokTile00;
-		tileSet[2] = pokTile01;
-		tileSet[3] = pokTile02;
-		tileSet[4] = pokTile03;
-		
+		// Creates the array that is used to pick the tiles used for the upcoming sprite/entity.
 		int testArr[] = new int[] {1,2,3,4};
 		
+		// Creates the sprite and then adds it to a sprite array. This is because an entity can consist of multiple sprites (i.e. one for looking up, another for left, walking frame 1, walk frame 2, etc)
 		Sprite pokerman1 = new Sprite(testArr,2,2);
-		Sprite pokermanArr[] = new Sprite[]{pokerman1};
+		Sprite pokermanArr[] = new Sprite[2];
+		pokermanArr[0] = pokerman1;
+		///////////////////////////////////////////////////////////////
+		// More SPRITES! \\
+		pokTile0 = new int[] {4,4,4,4,4,4,4,4, 4,4,4,4,4,0,0,0, 4,4,4,4,0,1,1,1, 4,4,4,0,1,1,1,1, 4,4,4,0,1,1,1,1, 4,4,0,0,0,1,2,2, 4,4,0,0,0,0,0,0, 4,0,2,0,2,2,2,2};
+		pokTile1 = new int[] {4,4,4,4,4,4,4,4, 0,0,0,4,4,4,4,4, 1,1,1,0,4,4,4,4, 1,1,1,1,0,4,4,4, 1,1,1,1,0,4,4,4, 2,2,1,0,0,0,4,4, 0,0,0,0,0,0,4,4, 2,2,2,2,0,2,0,4};
+		pokTile2 = new int[] {4,0,2,2,2,2,0,2, 4,0,0,0,2,2,0,2, 4,0,2,0,0,2,2,1, 4,4,0,0,0,0,0,0, 4,4,4,0,0,1,0,0, 4,4,4,4,0,0,0,1, 4,4,4,4,0,1,1,0, 4,4,4,4,4,0,0,0};
+		pokTile3 = new int[] {2,0,2,2,2,2,0,4, 2,0,2,2,0,0,4,4, 1,2,2,0,1,0,4,4, 0,0,0,0,2,0,4,4, 0,0,2,2,0,0,4,4, 1,0,2,2,0,4,4,4, 0,4,0,0,4,4,4,4, 4,4,4,4,4,4,4,4};
+
+		tileSet[5] = new Tile(pokTile0);
+		tileSet[6] = new Tile(pokTile1);
+		tileSet[7] = new Tile(pokTile2);
+		tileSet[8] = new Tile(pokTile3);
+
+		testArr = new int[] {5,6,7,8};
 		
+		pokerman1 = new Sprite(testArr,2,2);
+		pokermanArr[1] = pokerman1;
+		///////////////////////////////////////////////////////////////
+		// Creates the entity. The second line is just a duplicate to make sure it worked.
 		Entity pokerman = new Entity("Player", pokermanArr);
 		Entity pokermanDos = new Entity("Player", pokermanArr);
+		
+		// Changing spawn location of the second one.
 		pokermanDos.setLocation(90, 25);
 		
+		// Adds the entities to the entity layer. Later, there should just be a list of all entities in the game and the entity layer should just grab from that when needed.
 		EntityLayer[0] = pokerman;
 		EntityLayer[1] = pokermanDos;
 	}
@@ -173,10 +197,29 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 		/*
 		 * Read user input.
 		 * Do game operations.
-		 * Update tile layers with any new tiles.
+		 * Update tile layers with any new tiles. <-- Need to change how all that works first
 		 */
 		
+		// Read user input
+		if(controls[0]) {
+			EntityLayer[0].changeDirection(0);
+			EntityLayer[0].accelerate(0,-2);
+		}
+		else if(controls[1]) {
+			EntityLayer[0].changeDirection(1);
+			EntityLayer[0].accelerate(2,0);
+		}
+		else if(controls[2]) {
+			EntityLayer[0].changeDirection(2);
+			EntityLayer[0].accelerate(0,2);
+		}
+		else if(controls[3]) {
+			EntityLayer[0].changeDirection(3);
+			EntityLayer[0].accelerate(-2,0);
+		}
 		
+		// Do game operations
+		EntityLayer[0].move();
 	}
 	
 	private void requestRender() {
@@ -259,15 +302,15 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 		*/
 
 		// render tile test \\
-		int x = cameraOffsetX;
-		int y = cameraOffsetY;
+		int x1 = cameraOffsetX;
+		int y1 = cameraOffsetY;
 		for(int i = 0; i < BackgroundLayer.length; i++) {
-			drawTile(BackgroundLayer[i],x,y,g2d);
+			drawTile(BackgroundLayer[i],x1,y1,g2d);
 			
-			x+=8;
-			if(x>159) {
-				x = cameraOffsetX;
-				y+=8;
+			x1+=8;
+			if(x1>159) {
+				x1 = cameraOffsetX;
+				y1+=8;
 			}
 		}
 		
@@ -275,19 +318,21 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 		int tile;
 		Sprite sprite;
 		
+		int x,y;
+		
 		for(Entity entity : EntityLayer) {
 			sprite = entity.getSprite(entity.getSpriteState());
 			width = sprite.getWidth();
 			height = sprite.getHeight();
-			x = entity.getX();
-			y = entity.getY();
+			x = (int)entity.getX();
+			y = (int)entity.getY();
 
 			for(int i = 0; i < width+height; i++) {
 				tile = sprite.getTileSheetElement(i);
 				drawTile(tile,x,y,g2d);
 				x+=8;
-				if(x - entity.getX() >= 8 * width) {
-					x = entity.getX();
+				if(x - (int)entity.getX() >= 8 * width) {
+					x = (int)entity.getX();
 					y+=8;
 				}
 			}
@@ -320,53 +365,42 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 	
 	@Override
 	public void keyPressed(KeyEvent e) {
-		// TODO Auto-generated method stub
 		int key = e.getKeyCode();
-		buttonPress = true;
-		/*
+		
+		//buttonPress = true;
+		//Entity boi = EntityLayer[0];
+		
 		if(key == KeyEvent.VK_UP) {
-			cameraOffsetY++;
-			if(cameraOffsetY>-1) {
-				cameraOffsetY = -1;
-			}
-		}
-		if(key == KeyEvent.VK_DOWN) {
-			cameraOffsetY--;
-			if(cameraOffsetY<-15) {
-				cameraOffsetY = -15;
-			}
-		}
-		if(key == KeyEvent.VK_LEFT) {
-			cameraOffsetX++;
-			if(cameraOffsetX>-1) {
-				cameraOffsetX = -1;
-			}
+			controls[0] = true;
+			//boi.changeDirection(0);
+			//boi.accelerate(0,-4);
 		}
 		if(key == KeyEvent.VK_RIGHT) {
-			cameraOffsetX--;
-			if(cameraOffsetX<-15) {
-				cameraOffsetX = -15;
-			}
-		}
-		*/
-		Entity boi = EntityLayer[0];
-		if(key == KeyEvent.VK_UP) {
-			boi.setLocation(boi.getX(),boi.getY() - 1);
+			controls[1] = true;
 		}
 		if(key == KeyEvent.VK_DOWN) {
-			boi.setLocation(boi.getX(),boi.getY() + 1);
+			controls[2] = true;
 		}
 		if(key == KeyEvent.VK_LEFT) {
-			boi.setLocation(boi.getX()-1,boi.getY());
-		}
-		if(key == KeyEvent.VK_RIGHT) {
-			boi.setLocation(boi.getX()+1,boi.getY());
+			controls[3] = true;
 		}
 	}
 	@Override
-	public void keyReleased(KeyEvent arg0) {
-		// TODO Auto-generated method stub
+	public void keyReleased(KeyEvent e) {
+		int key = e.getKeyCode();
 		
+		if(key == KeyEvent.VK_UP) {
+			controls[0] = false;
+		}
+		if(key == KeyEvent.VK_RIGHT) {
+			controls[1] = false;
+		}
+		if(key == KeyEvent.VK_DOWN) {
+			controls[2] = false;
+		}
+		if(key == KeyEvent.VK_LEFT) {
+			controls[3] = false;
+		}
 	}
 	@Override
 	public void keyTyped(KeyEvent arg0) {
