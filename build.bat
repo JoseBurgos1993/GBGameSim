@@ -1,4 +1,7 @@
 :: COMPILES THE PROGRAM BY RUNNING THE MAKEFILE UNDER THE "SRC" DIRECTORY
 @ECHO OFF
 cd src
-gmake --makefile .\makefile
+ECHO Main-Class: Engine.MainClass > manifest.txt
+javac ./Engine/*.java
+jar cvfe game.jar Engine.MainClass Engine/*.class
+DEL manifest.txt
