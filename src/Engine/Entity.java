@@ -2,16 +2,18 @@ package Engine;
 
 public class Entity {
 
-	private String spriteType;
-	private int allTiles[];
+	private String spriteType = "Default";
+	//private int allTiles[];
 	private Sprite spriteSheet[];
-	private int x, y = 0; // Coordinates
+	private int x = 40;
+	private int y = 40; // Coordinates
 	private int width, height; // Measured in tiles. Each tile is 8x8 pixels.
 	private int direction; // I'll make this an enum later
+	private int spriteState = 0; // INT that represents the index for which sprite is active.
 	
-	public Entity(String spriteType, int[] allTiles, Sprite[] spriteSheet) {
+	public Entity(String spriteType, Sprite[] spriteSheet) {
 		this.spriteType = spriteType;
-		this.allTiles = allTiles;
+		//this.allTiles = allTiles;
 		this.spriteSheet = spriteSheet;
 	}
 	
@@ -37,6 +39,10 @@ public class Entity {
 	
 	public int getHeight() {
 		return height;
+	}
+	
+	public int getSpriteState() {
+		return spriteState;
 	}
 	
 	public void setLocation(int x, int y) {

@@ -42,8 +42,8 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 	private int cameraPosY = 0;
 	private Tile   tileSet[]         = new Tile[256];   // The tileset that the game uses. I'll figure it out later. The elements in the int layers refer to a tile in this array.
 	//private int    BackgroundLayer[] = new int[1024];  // 32x32 tiles. 20x18 is the screen size, but an extra tile is needed on each side. So 22x20. But then I need the extra stuff. So 32x32.
-	private int    BackgroundLayer[] = new int[440];  // 32x32 tiles. 20x18 is the screen size, but an extra tile is needed on each side. So 22x20. But then I need the extra stuff. So 32x32.
-	private Sprite SpriteLayer[]     = new Sprite[40]; // Rather than tiles, this contains the sprites themselves. I'll figure out the sprite limit later.
+	private int    BackgroundLayer[] = new int[440];  // 20x18 is the screen size, but an extra tile is needed on each side. So 22x20.
+	private Entity EntityLayer[]     = new Entity[2]; // Rather than tiles, this contains the sprites themselves. I'll figure out the sprite limit later.
 	private int    WindowLayer[]     = new int[1024];
 	
 	// Render \\
@@ -120,10 +120,10 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 	private void createTestGameTiles() {
 		int tile1[] = new int[64];
 		Arrays.fill(tile1, 1);
-		tile1[10] = 2;
-		tile1[13] = 2;
-		tile1[18] = 2;
-		tile1[21] = 2;
+		tile1[10] = 3;
+		tile1[13] = 3;
+		tile1[18] = 3;
+		tile1[21] = 3;
 
 		tile1[33] = 0;
 		tile1[38] = 0;
@@ -133,11 +133,38 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 		tile1[52] = 0;
 		tileSet[0] = new Tile(tile1);
 		Arrays.fill(BackgroundLayer, 0);
+		
+		int pokTile0[] = new int[] {4,4,4,4,4,0,0,0,  4,4,4,4,0,1,1,1,  4,4,4,0,1,1,1,1,  4,4,4,0,1,1,1,1,  4,4,0,0,0,1,2,2,  4,4,0,0,1,0,0,0,  4,0,2,0,2,2,2,2,  4,0,2,2,2,2,0,2};
+		int pokTile1[] = new int[] {0,0,0,4,4,4,4,4,  1,1,1,0,4,4,4,4,  1,1,1,1,0,4,4,4,  1,1,1,1,0,4,4,4,  2,2,1,0,0,0,4,4,  0,0,0,1,0,0,4,4,  2,2,2,2,0,2,0,4,  2,0,2,2,2,2,0,4};
+		int pokTile2[] = new int[] {4,4,0,0,2,2,0,2,  4,4,0,0,0,2,2,1,  4,0,2,2,0,0,0,0,  4,0,2,2,0,0,0,0,  4,4,0,0,0,1,1,0,  4,4,4,0,1,0,0,1,  4,4,4,0,1,1,1,0,  4,4,4,4,0,0,0,4};
+		int pokTile3[] = new int[] {2,0,2,2,0,0,4,4,  1,2,2,0,0,0,4,4,  0,0,0,0,2,2,0,4,  0,0,0,0,2,2,0,4,  0,1,1,0,0,0,4,4,  1,0,0,1,0,4,4,4,  0,1,1,1,0,4,4,4,  4,0,0,0,4,4,4,4};
+		
+		Tile pokTile00 = new Tile(pokTile0);
+		Tile pokTile01 = new Tile(pokTile1);
+		Tile pokTile02 = new Tile(pokTile2);
+		Tile pokTile03 = new Tile(pokTile3);
+		
+		tileSet[1] = pokTile00;
+		tileSet[2] = pokTile01;
+		tileSet[3] = pokTile02;
+		tileSet[4] = pokTile03;
+		
+		int testArr[] = new int[] {1,2,3,4};
+		
+		Sprite pokerman1 = new Sprite(testArr,2,2);
+		Sprite pokermanArr[] = new Sprite[]{pokerman1};
+		
+		Entity pokerman = new Entity("Player", pokermanArr);
+		Entity pokermanDos = new Entity("Player", pokermanArr);
+		pokermanDos.setLocation(90, 25);
+		
+		EntityLayer[0] = pokerman;
+		EntityLayer[1] = pokermanDos;
 	}
 	
 	private void setColorPallete() { // I have one color pallete for testing. More coming later...
 		switch(chosenPallete) {
-			case  0: colorPallete[0] = Color.black; colorPallete[1] = Color.white; colorPallete[2] = Color.red; colorPallete[3] = Color.green;
+			case  0: colorPallete[0] = Color.black; colorPallete[1] = Color.DARK_GRAY; colorPallete[2] = Color.LIGHT_GRAY; colorPallete[3] = Color.red; break;
 			default: colorPallete[0] = Color.black; colorPallete[1] = Color.white; colorPallete[2] = Color.red; colorPallete[3] = Color.green;
 		}
 	}
@@ -243,6 +270,28 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 				y+=8;
 			}
 		}
+		
+		int width,height;
+		int tile;
+		Sprite sprite;
+		
+		for(Entity entity : EntityLayer) {
+			sprite = entity.getSprite(entity.getSpriteState());
+			width = sprite.getWidth();
+			height = sprite.getHeight();
+			x = entity.getX();
+			y = entity.getY();
+
+			for(int i = 0; i < width+height; i++) {
+				tile = sprite.getTileSheetElement(i);
+				drawTile(tile,x,y,g2d);
+				x+=8;
+				if(x - entity.getX() >= 8 * width) {
+					x = entity.getX();
+					y+=8;
+				}
+			}
+		}
 		///////////\\\\\\\\\\\
 	}
 	
@@ -252,6 +301,9 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 		int xOffset = 0;
 		int yOffset = 0;
 		for(int i = 0; i < tile.length; i++) {
+			if(tile[i] == 4) {
+				continue;
+			}
 			xOffset = i%8;
 			yOffset = (int)i/8;
 			tileX = x+xOffset;
@@ -271,6 +323,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 		// TODO Auto-generated method stub
 		int key = e.getKeyCode();
 		buttonPress = true;
+		/*
 		if(key == KeyEvent.VK_UP) {
 			cameraOffsetY++;
 			if(cameraOffsetY>-1) {
@@ -294,6 +347,20 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 			if(cameraOffsetX<-15) {
 				cameraOffsetX = -15;
 			}
+		}
+		*/
+		Entity boi = EntityLayer[0];
+		if(key == KeyEvent.VK_UP) {
+			boi.setLocation(boi.getX(),boi.getY() - 1);
+		}
+		if(key == KeyEvent.VK_DOWN) {
+			boi.setLocation(boi.getX(),boi.getY() + 1);
+		}
+		if(key == KeyEvent.VK_LEFT) {
+			boi.setLocation(boi.getX()-1,boi.getY());
+		}
+		if(key == KeyEvent.VK_RIGHT) {
+			boi.setLocation(boi.getX()+1,boi.getY());
 		}
 	}
 	@Override

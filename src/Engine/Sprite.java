@@ -14,6 +14,7 @@ public class Sprite {
 		this.tileSheet = tileSheet;
 		this.width = width;
 		this.height = height;
+		System.out.println(this.width + " " + this.height);
 	}
 	
 	public int[] getTileSheet(){
