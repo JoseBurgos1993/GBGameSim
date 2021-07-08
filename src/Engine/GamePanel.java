@@ -84,7 +84,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 			elapsed = System.nanoTime() - startTime;
 			wait = targetTime - elapsed / 1000000;
 			if(frame_count == FRAME_RATE) {
-				//System.out.println("Time Used = " + elapsed / 1000000 + "/" + targetTime);
+				System.out.println("Time Used = " + elapsed / 1000000 + "/" + targetTime);
 				frame_count = 0;
 			}
 			/////////\\\\\\\\
