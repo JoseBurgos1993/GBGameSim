@@ -85,6 +85,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 			frame_count++;
 			elapsed = System.nanoTime() - startTime;
 			wait = targetTime - elapsed / 1000000;
+			
 			if(frame_count == FRAME_RATE) {
 				System.out.println("Time Used = " + elapsed / 1000000 + "/" + targetTime);
 				frame_count = 0;
@@ -213,7 +214,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 		pokerman1 = new Sprite(testArr,2,2);
 		pokermanArr[3] = pokerman1;
 		
-		// Stand north
+		// Stand north *DONE
 		pokTile0 = new byte[] {4,4,4,4,4,0,0,0, 4,4,4,4,0,1,1,1, 4,4,4,0,1,1,1,1, 4,4,4,0,1,1,1,1, 4,4,0,0,1,1,1,1, 4,4,0,0,0,4,4,4, 4,0,2,0,0,0,0,0, 4,0,2,2,0,0,0,0};
 		pokTile1 = new byte[] {0,0,0,4,4,4,4,4, 1,1,1,0,4,4,4,4, 1,1,1,1,0,4,4,4, 1,1,1,1,0,4,4,4, 1,1,1,1,0,0,4,4, 1,1,1,0,0,0,4,4, 0,0,0,0,0,2,0,4, 0,0,0,0,2,2,0,4}; // Mirror of previous
 		pokTile2 = new byte[] {4,4,0,0,2,2,0,0, 4,4,0,0,0,0,1,1, 4,0,2,0,0,1,0,0, 4,0,2,0,0,1,1,2, 4,4,0,0,0,0,1,1, 4,4,4,0,1,0,0,0, 4,4,4,0,1,1,1,0, 4,4,4,4,0,0,0,4};
@@ -229,7 +230,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 		pokerman1 = new Sprite(testArr,2,2);
 		pokermanArr[4] = pokerman1;
 		
-		// Walk north
+		// Walk north * DONE
 		pokTile0 = new byte[] {4,4,4,4,4,4,4,4, 4,4,4,4,4,0,0,0, 4,4,4,4,0,1,1,1, 4,4,4,0,1,1,1,1, 4,4,4,0,1,1,1,1, 4,4,0,0,1,1,1,1, 4,4,0,0,0,1,1,1, 4,0,2,0,0,0,0,0};
 		pokTile1 = new byte[] {4,4,4,4,4,4,4,4, 0,0,0,4,4,4,4,4, 1,1,1,0,4,4,4,4, 1,1,1,1,0,4,4,4, 1,1,1,1,0,4,4,4, 1,1,1,1,0,0,4,4, 1,1,1,0,0,0,4,4, 0,0,0,0,0,2,0,4}; // Mirror of previous
 		pokTile2 = new byte[] {4,0,2,2,0,0,0,0, 4,0,0,0,2,2,0,0, 4,0,2,0,0,0,1,1, 4,4,0,0,0,1,0,0, 4,4,4,0,0,1,1,2, 4,4,4,4,0,0,1,1, 4,4,4,4,0,1,0,0, 4,4,4,4,4,0,0,0};
@@ -279,30 +280,33 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 		// Read user input
 		if(controls[0]) {
 			EntityLayer[0].changeDirection(0);
-			EntityLayer[0].accelerate(0,-2);
+			EntityLayer[0].accelerate(0,-0.2);
 		}
 		else if(controls[1]) {
 			EntityLayer[0].changeDirection(1);
-			EntityLayer[0].accelerate(2,0);
+			EntityLayer[0].accelerate(0.2,0);
 		}
 		else if(controls[2]) {
 			EntityLayer[0].changeDirection(2);
-			EntityLayer[0].accelerate(0,2);
+			EntityLayer[0].accelerate(0,0.2);
 		}
 		else if(controls[3]) {
 			EntityLayer[0].changeDirection(3);
-			EntityLayer[0].accelerate(-2,0);
+			EntityLayer[0].accelerate(-0.2,0);
 		}
 		
 		// Do game operations
+		EntityLayer[0].decrementFrameCountdown();
 		EntityLayer[0].move();
 		
 		// Update entity states
+		EntityLayer[0].updateSprite();
+		/*
 		for(Entity e : EntityLayer) {
 			if(e.changed()) {
 				e.updateSprite();
 			}
-		}
+		}*/
 	}
 	
 	private void requestRender() {
@@ -313,77 +317,6 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 	}
 	
 	private void render(Graphics2D g2d) {
-		/*
-		 * Below is for testing.
-		 * What I actually want is for this to render the Background Layer, then render the Sprite Layer, then Render the Window layer, but only if there is an update.
-		 * Technically I only want to redraw tiles if the camera moves or a sprite or window element moves, but the window will mostly be static.
-		 * 
-		 * renderBackground();
-		 * renderSprites();
-		 * renderWindow();
-		 * 
-		 */
-		
-		
-		
-		//g2d.clearRect(0, 0, WIDTH*MAGNIFICATION, HEIGHT*MAGNIFICATION);
-		
-		/*
-		int randx = (int)Math.floor(Math.random()*159);
-		int randy = (int)Math.floor(Math.random()*143);
-		g2d.setPaint(Color.red);
-		g2d.fillRect(randx * MAGNIFICATION, randy * MAGNIFICATION, MAGNIFICATION, MAGNIFICATION);
-		
-		*/
-		/*
-		// Get random Colors. Initializes to magenta so it doesn't crash.
-		Color one = Color.magenta;
-		Color two = Color.magenta;
-		Color three = Color.magenta;
-		
-		int rand = (int)Math.floor(Math.random()*3);
-		switch(rand) {
-			case 0: one = Color.yellow; break;
-			case 1: one = Color.magenta; break;
-			case 2: one = Color.green; break;
-			default: break;
-		}
-		rand = (int)Math.floor(Math.random()*3);
-		switch(rand) {
-			case 0: two = Color.red; break;
-			case 1: two = Color.white; break;
-			case 2: two = Color.blue; break;
-			default: break;
-		}
-		rand = (int)Math.floor(Math.random()*3);
-		switch(rand) {
-			case 0: three = Color.black; break;
-			case 1: three = Color.orange; break;
-			case 2: three = Color.gray; break;
-			default: break;
-		}
-		
-		// Fills the colorArray with the colors it needs.
-		int temp;
-		for(int i = 0; i < colorArray.length; i++) {
-			temp = i%3;
-			switch(temp) {
-				case 0: colorArray[i]=one; break;
-				case 1: colorArray[i]=two; break;
-				case 2: colorArray[i]=three; break;
-				default: colorArray[i]=Color.yellow; break;
-			}
-			offset++;
-			if(offset>2) offset = 0;
-		}
-		
-		// Draw on the canvas.
-		for(int i = 0; i < 23040; i++) {
-			g2d.setColor(colorArray[i]);
-			g2d.drawRect((i % WIDTH) * MAGNIFICATION, ((int)(i / WIDTH)) * MAGNIFICATION, MAGNIFICATION - 1, MAGNIFICATION - 1);
-		}
-		*/
-
 		// render tile test \\
 		int x1 = cameraOffsetX;
 		int y1 = cameraOffsetY;
@@ -404,7 +337,9 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 		int x,y;
 		
 		for(Entity entity : EntityLayer) {
+			//System.out.println(entity.getSpriteState());
 			sprite = entity.getSprite(entity.getSpriteState());
+			//sprite = entity.getSprite(0);
 			width = sprite.getWidth();
 			height = sprite.getHeight();
 			x = (int)entity.getX();
@@ -450,13 +385,8 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 	public void keyPressed(KeyEvent e) {
 		int key = e.getKeyCode();
 		
-		//buttonPress = true;
-		//Entity boi = EntityLayer[0];
-		
 		if(key == KeyEvent.VK_UP) {
 			controls[0] = true;
-			//boi.changeDirection(0);
-			//boi.accelerate(0,-4);
 		}
 		if(key == KeyEvent.VK_RIGHT) {
 			controls[1] = true;
