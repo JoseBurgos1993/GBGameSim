@@ -26,7 +26,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 	private long targetTime;
 	private static final int FRAME_RATE = 60;
 	
-	// TEMP TESTING GRAPHICS \\
+	// TEMP TESTING GRAPHICS \\ <-- Will be removed when unneeded
 	private int     frame_count    = 0;
 	private int     offset         = 0;
 	private boolean buttonPress    = false;
@@ -40,11 +40,10 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 	private int cameraOffsetY = -8; // Default is 8. Should go from -1 to -15.
 	private int cameraPosX = 0;
 	private int cameraPosY = 0;
-	private Tile   tileSet[]         = new Tile[256];   // The tileset that the game uses. I'll figure it out later. The elements in the int layers refer to a tile in this array.
-	//private int    BackgroundLayer[] = new int[1024];  // 32x32 tiles. 20x18 is the screen size, but an extra tile is needed on each side. So 22x20. But then I need the extra stuff. So 32x32.
-	private int    BackgroundLayer[] = new int[440];  // 20x18 is the screen size, but an extra tile is needed on each side. So 22x20.
-	private Entity EntityLayer[]     = new Entity[2]; // Rather than tiles, this contains the sprites themselves. I'll figure out the sprite limit later.
-	private int    WindowLayer[]     = new int[1024];
+	private Tile tileSet[] = new Tile[256];   // The tileset that the game uses. I'll figure it out later. The elements in the int layers refer to a tile in this array.
+	private byte BackgroundLayer[] = new byte[440];  // 20x18 is the screen size, but an extra tile is needed on each side. So 22x20.
+	private Entity EntityLayer[] = new Entity[2]; // Rather than tiles, this contains the sprites themselves. I'll figure out the sprite limit later.
+	private byte WindowLayer[] = new byte[1024];
 	
 	// Render \\
 	public static Graphics2D g2d;
@@ -122,8 +121,11 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 	
 	private void createTestGameTiles() {
 		// Creates Background Tile (the smiley face)
-		int tile1[] = new int[64];
-		Arrays.fill(tile1, 1); // Default filling the array with dark grey pixels. Followed by filling in specific elements with the colors to make the face.
+		byte tile1[] = new byte[64];
+		//Arrays.fill(tile1, 1); // Default filling the array with dark grey pixels. Followed by filling in specific elements with the colors to make the face.
+		for(int i = 0; i < tile1.length; i++) {
+			tile1[i] = 1;
+		}
 		tile1[10] = 3;
 		tile1[13] = 3;
 		tile1[18] = 3;
@@ -136,13 +138,16 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 		tile1[51] = 0;
 		tile1[52] = 0;
 		tileSet[0] = new Tile(tile1); // Adds this tile to the tileSet for the system
-		Arrays.fill(BackgroundLayer, 0); // Fills the whole background layer with this tile.
-		
+		//Arrays.fill(BackgroundLayer, 0); // Fills the whole background layer with this tile.
+		for(int i = 0; i < BackgroundLayer.length; i++) {
+			BackgroundLayer[i] = 0;
+		}
 		// Creating pokemon boy. First 4 lines create 4 tiles with the appropriate colors.
-		int pokTile0[] = new int[] {4,4,4,4,4,0,0,0,  4,4,4,4,0,1,1,1,  4,4,4,0,1,1,1,1,  4,4,4,0,1,1,1,1,  4,4,0,0,0,1,2,2,  4,4,0,0,1,0,0,0,  4,0,2,0,2,2,2,2,  4,0,2,2,2,2,0,2};
-		int pokTile1[] = new int[] {0,0,0,4,4,4,4,4,  1,1,1,0,4,4,4,4,  1,1,1,1,0,4,4,4,  1,1,1,1,0,4,4,4,  2,2,1,0,0,0,4,4,  0,0,0,1,0,0,4,4,  2,2,2,2,0,2,0,4,  2,0,2,2,2,2,0,4};
-		int pokTile2[] = new int[] {4,4,0,0,2,2,0,2,  4,4,0,0,0,2,2,1,  4,0,2,2,0,0,0,0,  4,0,2,2,0,0,0,0,  4,4,0,0,0,1,1,0,  4,4,4,0,1,0,0,1,  4,4,4,0,1,1,1,0,  4,4,4,4,0,0,0,4};
-		int pokTile3[] = new int[] {2,0,2,2,0,0,4,4,  1,2,2,0,0,0,4,4,  0,0,0,0,2,2,0,4,  0,0,0,0,2,2,0,4,  0,1,1,0,0,0,4,4,  1,0,0,1,0,4,4,4,  0,1,1,1,0,4,4,4,  4,0,0,0,4,4,4,4};
+		// Stand down *DONE
+		byte pokTile0[] = new byte[] {4,4,4,4,4,0,0,0,  4,4,4,4,0,1,1,1,  4,4,4,0,1,1,1,1,  4,4,4,0,1,1,1,1,  4,4,0,0,0,1,2,2,  4,4,0,0,1,0,0,0,  4,0,2,0,2,2,2,2,  4,0,2,2,2,2,0,2};
+		byte pokTile1[] = new byte[] {0,0,0,4,4,4,4,4,  1,1,1,0,4,4,4,4,  1,1,1,1,0,4,4,4,  1,1,1,1,0,4,4,4,  2,2,1,0,0,0,4,4,  0,0,0,1,0,0,4,4,  2,2,2,2,0,2,0,4,  2,0,2,2,2,2,0,4}; // Mirror of previous
+		byte pokTile2[] = new byte[] {4,4,0,0,2,2,0,2,  4,4,0,0,0,2,2,1,  4,0,2,2,0,0,0,0,  4,0,2,2,0,0,0,0,  4,4,0,0,0,1,1,0,  4,4,4,0,1,0,0,1,  4,4,4,0,1,1,1,0,  4,4,4,4,0,0,0,4};
+		byte pokTile3[] = new byte[] {2,0,2,2,0,0,4,4,  1,2,2,0,0,0,4,4,  0,0,0,0,2,2,0,4,  0,0,0,0,2,2,0,4,  0,1,1,0,0,0,4,4,  1,0,0,1,0,4,4,4,  0,1,1,1,0,4,4,4,  4,0,0,0,4,4,4,4}; // Mirror of previous
 		
 		// Adds these tiles to the tileSet
 		tileSet[1] = new Tile(pokTile0);
@@ -155,14 +160,15 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 		
 		// Creates the sprite and then adds it to a sprite array. This is because an entity can consist of multiple sprites (i.e. one for looking up, another for left, walking frame 1, walk frame 2, etc)
 		Sprite pokerman1 = new Sprite(testArr,2,2);
-		Sprite pokermanArr[] = new Sprite[2];
+		Sprite pokermanArr[] = new Sprite[6];
 		pokermanArr[0] = pokerman1;
 		///////////////////////////////////////////////////////////////
 		// More SPRITES! \\
-		pokTile0 = new int[] {4,4,4,4,4,4,4,4, 4,4,4,4,4,0,0,0, 4,4,4,4,0,1,1,1, 4,4,4,0,1,1,1,1, 4,4,4,0,1,1,1,1, 4,4,0,0,0,1,2,2, 4,4,0,0,0,0,0,0, 4,0,2,0,2,2,2,2};
-		pokTile1 = new int[] {4,4,4,4,4,4,4,4, 0,0,0,4,4,4,4,4, 1,1,1,0,4,4,4,4, 1,1,1,1,0,4,4,4, 1,1,1,1,0,4,4,4, 2,2,1,0,0,0,4,4, 0,0,0,0,0,0,4,4, 2,2,2,2,0,2,0,4};
-		pokTile2 = new int[] {4,0,2,2,2,2,0,2, 4,0,0,0,2,2,0,2, 4,0,2,0,0,2,2,1, 4,4,0,0,0,0,0,0, 4,4,4,0,0,1,0,0, 4,4,4,4,0,0,0,1, 4,4,4,4,0,1,1,0, 4,4,4,4,4,0,0,0};
-		pokTile3 = new int[] {2,0,2,2,2,2,0,4, 2,0,2,2,0,0,4,4, 1,2,2,0,1,0,4,4, 0,0,0,0,2,0,4,4, 0,0,2,2,0,0,4,4, 1,0,2,2,0,4,4,4, 0,4,0,0,4,4,4,4, 4,4,4,4,4,4,4,4};
+		// Walk down *DONE
+		pokTile0 = new byte[] {4,4,4,4,4,4,4,4, 4,4,4,4,4,0,0,0, 4,4,4,4,0,1,1,1, 4,4,4,0,1,1,1,1, 4,4,4,0,1,1,1,1, 4,4,0,0,0,1,2,2, 4,4,0,0,0,0,0,0, 4,0,2,0,2,2,2,2};
+		pokTile1 = new byte[] {4,4,4,4,4,4,4,4, 0,0,0,4,4,4,4,4, 1,1,1,0,4,4,4,4, 1,1,1,1,0,4,4,4, 1,1,1,1,0,4,4,4, 2,2,1,0,0,0,4,4, 0,0,0,0,0,0,4,4, 2,2,2,2,0,2,0,4}; // Mirror of previous
+		pokTile2 = new byte[] {4,0,2,2,2,2,0,2, 4,0,0,0,2,2,0,2, 4,0,2,0,0,2,2,1, 4,4,0,0,0,0,0,0, 4,4,4,0,0,1,0,0, 4,4,4,4,0,0,0,1, 4,4,4,4,0,1,1,0, 4,4,4,4,4,0,0,0};
+		pokTile3 = new byte[] {2,0,2,2,2,2,0,4, 2,0,2,2,0,0,4,4, 1,2,2,0,1,0,4,4, 0,0,0,0,2,0,4,4, 0,0,2,2,0,0,4,4, 1,0,2,2,0,4,4,4, 0,4,0,0,4,4,4,4, 4,4,4,4,4,4,4,4};
 
 		tileSet[5] = new Tile(pokTile0);
 		tileSet[6] = new Tile(pokTile1);
@@ -173,6 +179,76 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 		
 		pokerman1 = new Sprite(testArr,2,2);
 		pokermanArr[1] = pokerman1;
+		
+		// Stand left *DONE
+		
+		pokTile0 = new byte[] {4,4,4,4,4,0,0,0, 4,4,4,4,0,1,1,1, 4,4,4,0,1,1,1,1, 4,4,0,0,2,1,1,1, 4,0,2,2,2,2,1,1, 4,4,0,0,1,1,1,0, 4,4,4,0,2,0,2,2, 4,4,4,0,2,0,2,2};
+		pokTile1 = new byte[] {0,0,0,4,4,4,4,4, 1,1,1,0,4,4,4,4, 1,1,1,1,0,4,4,4, 1,1,1,1,0,4,4,4, 1,1,1,0,0,0,4,4, 0,0,0,0,0,0,4,4, 0,0,0,0,0,0,4,4, 0,2,2,0,0,4,4,4};
+		pokTile2 = new byte[] {4,4,4,0,2,2,2,2, 4,4,4,4,0,1,2,2, 4,4,4,4,4,0,0,0, 4,4,4,4,4,4,0,0, 4,4,4,4,4,4,0,0, 4,4,4,4,4,0,1,1, 4,4,4,4,4,0,1,1, 4,4,4,4,4,4,0,0};
+		pokTile3 = new byte[] {2,2,2,0,4,4,4,4, 4,0,0,1,0,4,4,4, 0,0,1,1,0,4,4,4, 2,2,0,1,0,4,4,4, 2,2,0,1,0,4,4,4, 0,0,0,0,4,4,4,4, 1,1,0,4,4,4,4,4, 0,0,4,4,4,4,4,4};
+
+		tileSet[9] = new Tile(pokTile0);
+		tileSet[10] = new Tile(pokTile1);
+		tileSet[11] = new Tile(pokTile2);
+		tileSet[12] = new Tile(pokTile3);
+
+		testArr = new int[] {9,10,11,12};
+		
+		pokerman1 = new Sprite(testArr,2,2);
+		pokermanArr[2] = pokerman1;
+		
+		// Walk left *DONE
+		pokTile0 = new byte[] {4,4,4,4,4,4,4,4, 4,4,4,4,4,0,0,0, 4,4,4,4,0,1,1,1, 4,4,4,0,1,1,1,1, 4,4,0,0,2,1,1,1, 4,0,2,2,2,2,1,1, 4,4,0,0,1,1,1,0, 4,4,4,0,2,0,2,2};
+		pokTile1 = new byte[] {4,4,4,4,4,4,4,4, 0,0,0,4,4,4,4,4, 1,1,1,0,4,4,4,4, 1,1,1,1,0,4,4,4, 1,1,1,1,0,4,4,4, 1,1,1,0,0,0,4,4, 0,0,0,0,0,0,4,4, 0,0,0,0,0,0,4,4};
+		pokTile2 = new byte[] {4,4,4,0,2,0,2,2, 4,4,4,0,2,2,2,2, 4,4,4,4,0,1,2,2, 4,4,4,4,4,0,0,0, 4,4,4,0,0,0,0,0, 4,4,0,1,1,0,1,1, 4,4,4,0,1,1,0,0, 4,4,4,4,0,0,0,4};
+		pokTile3 = new byte[] {0,2,2,0,0,4,4,4, 2,2,2,0,4,4,4,4, 2,0,0,1,0,4,4,4, 0,0,0,1,0,4,4,4, 0,2,2,0,0,4,4,4, 0,2,2,0,1,0,4,4, 0,0,0,1,1,0,4,4, 4,4,4,0,0,4,4,4};
+
+		tileSet[13] = new Tile(pokTile0);
+		tileSet[14] = new Tile(pokTile1);
+		tileSet[15] = new Tile(pokTile2);
+		tileSet[16] = new Tile(pokTile3);
+
+		testArr = new int[] {13,14,15,16};
+		
+		pokerman1 = new Sprite(testArr,2,2);
+		pokermanArr[3] = pokerman1;
+		
+		// Stand north
+		pokTile0 = new byte[] {4,4,4,4,4,0,0,0, 4,4,4,4,0,1,1,1, 4,4,4,0,1,1,1,1, 4,4,4,0,1,1,1,1, 4,4,0,0,1,1,1,1, 4,4,0,0,0,4,4,4, 4,0,2,0,0,0,0,0, 4,0,2,2,0,0,0,0};
+		pokTile1 = new byte[] {0,0,0,4,4,4,4,4, 1,1,1,0,4,4,4,4, 1,1,1,1,0,4,4,4, 1,1,1,1,0,4,4,4, 1,1,1,1,0,0,4,4, 1,1,1,0,0,0,4,4, 0,0,0,0,0,2,0,4, 0,0,0,0,2,2,0,4}; // Mirror of previous
+		pokTile2 = new byte[] {4,4,0,0,2,2,0,0, 4,4,0,0,0,0,1,1, 4,0,2,0,0,1,0,0, 4,0,2,0,0,1,1,2, 4,4,0,0,0,0,1,1, 4,4,4,0,1,0,0,0, 4,4,4,0,1,1,1,0, 4,4,4,4,0,0,0,4};
+		pokTile3 = new byte[] {0,0,2,2,0,0,4,4, 1,1,0,0,0,0,4,4, 0,0,1,0,0,2,0,4, 2,1,1,0,0,2,0,4, 1,1,0,0,0,0,4,4, 0,0,0,1,0,4,4,4, 0,1,1,1,0,4,4,4, 4,0,0,0,4,4,4,4}; // Mirror of previous
+
+		tileSet[17] = new Tile(pokTile0);
+		tileSet[18] = new Tile(pokTile1);
+		tileSet[19] = new Tile(pokTile2);
+		tileSet[20] = new Tile(pokTile3);
+		
+		testArr = new int[] {17,18,19,20};
+		
+		pokerman1 = new Sprite(testArr,2,2);
+		pokermanArr[4] = pokerman1;
+		
+		// Walk north
+		pokTile0 = new byte[] {4,4,4,4,4,4,4,4, 4,4,4,4,4,0,0,0, 4,4,4,4,0,1,1,1, 4,4,4,0,1,1,1,1, 4,4,4,0,1,1,1,1, 4,4,0,0,1,1,1,1, 4,4,0,0,0,1,1,1, 4,0,2,0,0,0,0,0};
+		pokTile1 = new byte[] {4,4,4,4,4,4,4,4, 0,0,0,4,4,4,4,4, 1,1,1,0,4,4,4,4, 1,1,1,1,0,4,4,4, 1,1,1,1,0,4,4,4, 1,1,1,1,0,0,4,4, 1,1,1,0,0,0,4,4, 0,0,0,0,0,2,0,4}; // Mirror of previous
+		pokTile2 = new byte[] {4,0,2,2,0,0,0,0, 4,0,0,0,2,2,0,0, 4,0,2,0,0,0,1,1, 4,4,0,0,0,1,0,0, 4,4,4,0,0,1,1,2, 4,4,4,4,0,0,1,1, 4,4,4,4,0,1,0,0, 4,4,4,4,4,0,0,0};
+		pokTile3 = new byte[] {0,0,0,0,2,2,0,4, 0,0,2,2,0,0,4,4, 1,1,0,0,0,0,4,4, 0,0,1,0,2,2,0,4, 2,1,1,0,2,2,0,4, 1,1,0,0,0,0,4,4, 0,0,4,4,4,4,4,4, 4,4,4,4,4,4,4,4};
+
+		tileSet[21] = new Tile(pokTile0);
+		tileSet[22] = new Tile(pokTile1);
+		tileSet[23] = new Tile(pokTile2);
+		tileSet[24] = new Tile(pokTile3);
+
+		testArr = new int[] {21,22,23,24};
+		
+		pokerman1 = new Sprite(testArr,2,2);
+		pokermanArr[5] = pokerman1;
+		
+		
+		
+		
+		
 		///////////////////////////////////////////////////////////////
 		// Creates the entity. The second line is just a duplicate to make sure it worked.
 		Entity pokerman = new Entity("Player", pokermanArr);
@@ -220,6 +296,13 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 		
 		// Do game operations
 		EntityLayer[0].move();
+		
+		// Update entity states
+		for(Entity e : EntityLayer) {
+			if(e.changed()) {
+				e.updateSprite();
+			}
+		}
 	}
 	
 	private void requestRender() {
@@ -326,7 +409,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 			height = sprite.getHeight();
 			x = (int)entity.getX();
 			y = (int)entity.getY();
-
+			
 			for(int i = 0; i < width+height; i++) {
 				tile = sprite.getTileSheetElement(i);
 				drawTile(tile,x,y,g2d);
@@ -341,7 +424,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 	}
 	
 	private void drawTile(int tileNum, int x, int y, Graphics2D g2d) {
-		int tile[] = tileSet[tileNum].getTile();
+		byte tile[] = tileSet[tileNum].getTile();
 		int tileX, tileY = 0;
 		int xOffset = 0;
 		int yOffset = 0;

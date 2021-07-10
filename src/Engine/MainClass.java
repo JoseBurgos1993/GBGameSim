@@ -13,7 +13,7 @@ import Engine.GamePanel;
 public class MainClass {
 	
 	public static void main(String[] args) {
-		System.out.println("Hello, world.");
+		System.out.println("Hello, butts.");
 		
 		JFrame frame = new JFrame("Game Window");
 		GamePanel game = new GamePanel();
