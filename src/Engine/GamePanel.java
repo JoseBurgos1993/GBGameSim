@@ -26,24 +26,23 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 	private long targetTime;
 	private static final int FRAME_RATE = 60;
 	
-	// TEMP TESTING GRAPHICS \\ <-- Will be removed when unneeded
+	// TEMP TESTING GRAPHICS \\ <-- TODO Will be removed when unneeded
 	private int     frame_count    = 0;
-	private int     offset         = 0;
-	private boolean buttonPress    = false;
-	private Color   colorArray[]   = new Color[23040]; // Contains the colors for every pixel on screen.
-	private int     colorArray2[]  = new int[23040];
-	private Color   colorPallete[] = new Color[4];
-	private int     chosenPallete  = 0;
+	private Color   colorPallete[] = new Color[4]; // For more palletes, expand the array.  C = N + 4 * P, where N is the color number[1-4], P is the Pallete number[0+], and C is the index in the array. 0 is transparent.
+	private int     chosenPallete  = 0;            // TODO For now, it doesn't do that, but this is a note to change that.
 	
 	// Layers \\
-	private int cameraOffsetX = -8; // Default is 8. Should go from -1 to -15.
-	private int cameraOffsetY = -8; // Default is 8. Should go from -1 to -15.
+	private int cameraOffsetX = -8; // Default is -8. Should go from -1 to -15. This is for printing tiles.
+	private int cameraOffsetY = -8; // Default is -8. Should go from -1 to -15.
 	private int cameraPosX = 0;
 	private int cameraPosY = 0;
 	private Tile tileSet[] = new Tile[256];   // The tileset that the game uses. I'll figure it out later. The elements in the int layers refer to a tile in this array.
 	private byte BackgroundLayer[] = new byte[440];  // 20x18 is the screen size, but an extra tile is needed on each side. So 22x20.
-	private Entity EntityLayer[] = new Entity[2]; // Rather than tiles, this contains the sprites themselves. I'll figure out the sprite limit later.
-	private byte WindowLayer[] = new byte[1024];
+	private Entity EntityLayer[] = new Entity[2]; // TODO Rather than tiles, this contains the sprites themselves. I'll figure out the sprite limit later.
+	private byte WindowLayer[] = new byte[440]; // TODO Figure out how I want the window layer to work. It should probably be changed to sprites since some UI elements are animated.
+	
+	// Game Elements \\
+	private GameManager gameManager; // TODO This contains the game data. Will probably rename it. Maybe even call something else game manager.
 	
 	// Render \\
 	public static Graphics2D g2d;
@@ -82,14 +81,14 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 			requestRender();
 
 			// For testing \\
-			frame_count++;
+			//frame_count++;
 			elapsed = System.nanoTime() - startTime;
 			wait = targetTime - elapsed / 1000000;
 			
-			if(frame_count == FRAME_RATE) {
-				System.out.println("Time Used = " + elapsed / 1000000 + "/" + targetTime);
-				frame_count = 0;
-			}
+			//if(frame_count == FRAME_RATE) {
+			//	System.out.println("Time Used = " + elapsed / 1000000 + "/" + targetTime);
+			//	frame_count = 0;
+			//}
 			/////////\\\\\\\\
 			
 			if(wait > 0) {
@@ -100,7 +99,6 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 				}
 			}
 		}
-		
 	}
 	
 	private void init() {
@@ -109,15 +107,10 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 		g2d = image.createGraphics();
 		running = true;
 		
-		// This initalizaes the array to start with all black rather than start with empty spots
-		for(int i = 0; i < colorArray.length; i++) {
-			colorArray[i] = Color.black;
-		}
-		
 		// Sets the color pallete
 		setColorPallete();
-		
 		createTestGameTiles();
+		gameManager = new GameManager();
 	}
 	
 	private void createTestGameTiles() {
