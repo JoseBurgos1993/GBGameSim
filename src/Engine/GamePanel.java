@@ -37,9 +37,11 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 	private int cameraPosX = 0;
 	private int cameraPosY = 0;
 	private Tile tileSet[] = new Tile[256];   // The tileset that the game uses. I'll figure it out later. The elements in the int layers refer to a tile in this array.
-	private byte BackgroundLayer[] = new byte[440];  // 20x18 is the screen size, but an extra tile is needed on each side. So 22x20.
-	private Entity EntityLayer[] = new Entity[2]; // TODO Rather than tiles, this contains the sprites themselves. I'll figure out the sprite limit later.
-	private byte WindowLayer[] = new byte[440]; // TODO Figure out how I want the window layer to work. It should probably be changed to sprites since some UI elements are animated.
+	private byte BackgroundLayer[];// = new byte[440];  // 20x18 is the screen size, but an extra tile is needed on each side. So 22x20.
+	private Entity EntityLayer[];// = new Entity[2];
+	private Sprite SpriteLayer[];// = new Sprite[256];
+	private Sprite WindowLayer[];// = new Sprite[440]; // TODO Figure out how I want the window layer to work. It should probably be changed to sprites since some UI elements are animated.
+	private byte FinalPixelColors[] = new byte [23040];
 	
 	// Game Elements \\
 	private GameManager gameManager; // TODO This contains the game data. Will probably rename it. Maybe even call something else game manager.
@@ -49,7 +51,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 	private BufferedImage image;
 	
 	// User Controls \\
-	private boolean controls[] = new boolean[] {false,false,false,false};
+	private boolean controls[] = new boolean[] {false,false,false,false}; // Up, Right, Down, Left arrow keys. TODO Figure out a better way to read controls.
 	
 	public GamePanel() {
 		setPreferredSize(new Dimension(WIDTH*MAGNIFICATION, HEIGHT*MAGNIFICATION));
@@ -109,151 +111,11 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 		
 		// Sets the color pallete
 		setColorPallete();
-		createTestGameTiles();
 		gameManager = new GameManager();
-	}
-	
-	private void createTestGameTiles() {
-		// Creates Background Tile (the smiley face)
-		byte tile1[] = new byte[64];
-		//Arrays.fill(tile1, 1); // Default filling the array with dark grey pixels. Followed by filling in specific elements with the colors to make the face.
-		for(int i = 0; i < tile1.length; i++) {
-			tile1[i] = 1;
-		}
-		tile1[10] = 3;
-		tile1[13] = 3;
-		tile1[18] = 3;
-		tile1[21] = 3;
-
-		tile1[33] = 0;
-		tile1[38] = 0;
-		tile1[42] = 0;
-		tile1[45] = 0;
-		tile1[51] = 0;
-		tile1[52] = 0;
-		tileSet[0] = new Tile(tile1); // Adds this tile to the tileSet for the system
-		//Arrays.fill(BackgroundLayer, 0); // Fills the whole background layer with this tile.
-		for(int i = 0; i < BackgroundLayer.length; i++) {
-			BackgroundLayer[i] = 0;
-		}
-		// Creating pokemon boy. First 4 lines create 4 tiles with the appropriate colors.
-		// Stand down *DONE
-		byte pokTile0[] = new byte[] {4,4,4,4,4,0,0,0,  4,4,4,4,0,1,1,1,  4,4,4,0,1,1,1,1,  4,4,4,0,1,1,1,1,  4,4,0,0,0,1,2,2,  4,4,0,0,1,0,0,0,  4,0,2,0,2,2,2,2,  4,0,2,2,2,2,0,2};
-		byte pokTile1[] = new byte[] {0,0,0,4,4,4,4,4,  1,1,1,0,4,4,4,4,  1,1,1,1,0,4,4,4,  1,1,1,1,0,4,4,4,  2,2,1,0,0,0,4,4,  0,0,0,1,0,0,4,4,  2,2,2,2,0,2,0,4,  2,0,2,2,2,2,0,4}; // Mirror of previous
-		byte pokTile2[] = new byte[] {4,4,0,0,2,2,0,2,  4,4,0,0,0,2,2,1,  4,0,2,2,0,0,0,0,  4,0,2,2,0,0,0,0,  4,4,0,0,0,1,1,0,  4,4,4,0,1,0,0,1,  4,4,4,0,1,1,1,0,  4,4,4,4,0,0,0,4};
-		byte pokTile3[] = new byte[] {2,0,2,2,0,0,4,4,  1,2,2,0,0,0,4,4,  0,0,0,0,2,2,0,4,  0,0,0,0,2,2,0,4,  0,1,1,0,0,0,4,4,  1,0,0,1,0,4,4,4,  0,1,1,1,0,4,4,4,  4,0,0,0,4,4,4,4}; // Mirror of previous
-		
-		// Adds these tiles to the tileSet
-		tileSet[1] = new Tile(pokTile0);
-		tileSet[2] = new Tile(pokTile1);
-		tileSet[3] = new Tile(pokTile2);
-		tileSet[4] = new Tile(pokTile3);
-		
-		// Creates the array that is used to pick the tiles used for the upcoming sprite/entity.
-		int testArr[] = new int[] {1,2,3,4};
-		
-		// Creates the sprite and then adds it to a sprite array. This is because an entity can consist of multiple sprites (i.e. one for looking up, another for left, walking frame 1, walk frame 2, etc)
-		Sprite pokerman1 = new Sprite(testArr,2,2);
-		Sprite pokermanArr[] = new Sprite[6];
-		pokermanArr[0] = pokerman1;
-		///////////////////////////////////////////////////////////////
-		// More SPRITES! \\
-		// Walk down *DONE
-		pokTile0 = new byte[] {4,4,4,4,4,4,4,4, 4,4,4,4,4,0,0,0, 4,4,4,4,0,1,1,1, 4,4,4,0,1,1,1,1, 4,4,4,0,1,1,1,1, 4,4,0,0,0,1,2,2, 4,4,0,0,0,0,0,0, 4,0,2,0,2,2,2,2};
-		pokTile1 = new byte[] {4,4,4,4,4,4,4,4, 0,0,0,4,4,4,4,4, 1,1,1,0,4,4,4,4, 1,1,1,1,0,4,4,4, 1,1,1,1,0,4,4,4, 2,2,1,0,0,0,4,4, 0,0,0,0,0,0,4,4, 2,2,2,2,0,2,0,4}; // Mirror of previous
-		pokTile2 = new byte[] {4,0,2,2,2,2,0,2, 4,0,0,0,2,2,0,2, 4,0,2,0,0,2,2,1, 4,4,0,0,0,0,0,0, 4,4,4,0,0,1,0,0, 4,4,4,4,0,0,0,1, 4,4,4,4,0,1,1,0, 4,4,4,4,4,0,0,0};
-		pokTile3 = new byte[] {2,0,2,2,2,2,0,4, 2,0,2,2,0,0,4,4, 1,2,2,0,1,0,4,4, 0,0,0,0,2,0,4,4, 0,0,2,2,0,0,4,4, 1,0,2,2,0,4,4,4, 0,4,0,0,4,4,4,4, 4,4,4,4,4,4,4,4};
-
-		tileSet[5] = new Tile(pokTile0);
-		tileSet[6] = new Tile(pokTile1);
-		tileSet[7] = new Tile(pokTile2);
-		tileSet[8] = new Tile(pokTile3);
-
-		testArr = new int[] {5,6,7,8};
-		
-		pokerman1 = new Sprite(testArr,2,2);
-		pokermanArr[1] = pokerman1;
-		
-		// Stand left *DONE
-		
-		pokTile0 = new byte[] {4,4,4,4,4,0,0,0, 4,4,4,4,0,1,1,1, 4,4,4,0,1,1,1,1, 4,4,0,0,2,1,1,1, 4,0,2,2,2,2,1,1, 4,4,0,0,1,1,1,0, 4,4,4,0,2,0,2,2, 4,4,4,0,2,0,2,2};
-		pokTile1 = new byte[] {0,0,0,4,4,4,4,4, 1,1,1,0,4,4,4,4, 1,1,1,1,0,4,4,4, 1,1,1,1,0,4,4,4, 1,1,1,0,0,0,4,4, 0,0,0,0,0,0,4,4, 0,0,0,0,0,0,4,4, 0,2,2,0,0,4,4,4};
-		pokTile2 = new byte[] {4,4,4,0,2,2,2,2, 4,4,4,4,0,1,2,2, 4,4,4,4,4,0,0,0, 4,4,4,4,4,4,0,0, 4,4,4,4,4,4,0,0, 4,4,4,4,4,0,1,1, 4,4,4,4,4,0,1,1, 4,4,4,4,4,4,0,0};
-		pokTile3 = new byte[] {2,2,2,0,4,4,4,4, 4,0,0,1,0,4,4,4, 0,0,1,1,0,4,4,4, 2,2,0,1,0,4,4,4, 2,2,0,1,0,4,4,4, 0,0,0,0,4,4,4,4, 1,1,0,4,4,4,4,4, 0,0,4,4,4,4,4,4};
-
-		tileSet[9] = new Tile(pokTile0);
-		tileSet[10] = new Tile(pokTile1);
-		tileSet[11] = new Tile(pokTile2);
-		tileSet[12] = new Tile(pokTile3);
-
-		testArr = new int[] {9,10,11,12};
-		
-		pokerman1 = new Sprite(testArr,2,2);
-		pokermanArr[2] = pokerman1;
-		
-		// Walk left *DONE
-		pokTile0 = new byte[] {4,4,4,4,4,4,4,4, 4,4,4,4,4,0,0,0, 4,4,4,4,0,1,1,1, 4,4,4,0,1,1,1,1, 4,4,0,0,2,1,1,1, 4,0,2,2,2,2,1,1, 4,4,0,0,1,1,1,0, 4,4,4,0,2,0,2,2};
-		pokTile1 = new byte[] {4,4,4,4,4,4,4,4, 0,0,0,4,4,4,4,4, 1,1,1,0,4,4,4,4, 1,1,1,1,0,4,4,4, 1,1,1,1,0,4,4,4, 1,1,1,0,0,0,4,4, 0,0,0,0,0,0,4,4, 0,0,0,0,0,0,4,4};
-		pokTile2 = new byte[] {4,4,4,0,2,0,2,2, 4,4,4,0,2,2,2,2, 4,4,4,4,0,1,2,2, 4,4,4,4,4,0,0,0, 4,4,4,0,0,0,0,0, 4,4,0,1,1,0,1,1, 4,4,4,0,1,1,0,0, 4,4,4,4,0,0,0,4};
-		pokTile3 = new byte[] {0,2,2,0,0,4,4,4, 2,2,2,0,4,4,4,4, 2,0,0,1,0,4,4,4, 0,0,0,1,0,4,4,4, 0,2,2,0,0,4,4,4, 0,2,2,0,1,0,4,4, 0,0,0,1,1,0,4,4, 4,4,4,0,0,4,4,4};
-
-		tileSet[13] = new Tile(pokTile0);
-		tileSet[14] = new Tile(pokTile1);
-		tileSet[15] = new Tile(pokTile2);
-		tileSet[16] = new Tile(pokTile3);
-
-		testArr = new int[] {13,14,15,16};
-		
-		pokerman1 = new Sprite(testArr,2,2);
-		pokermanArr[3] = pokerman1;
-		
-		// Stand north *DONE
-		pokTile0 = new byte[] {4,4,4,4,4,0,0,0, 4,4,4,4,0,1,1,1, 4,4,4,0,1,1,1,1, 4,4,4,0,1,1,1,1, 4,4,0,0,1,1,1,1, 4,4,0,0,0,4,4,4, 4,0,2,0,0,0,0,0, 4,0,2,2,0,0,0,0};
-		pokTile1 = new byte[] {0,0,0,4,4,4,4,4, 1,1,1,0,4,4,4,4, 1,1,1,1,0,4,4,4, 1,1,1,1,0,4,4,4, 1,1,1,1,0,0,4,4, 1,1,1,0,0,0,4,4, 0,0,0,0,0,2,0,4, 0,0,0,0,2,2,0,4}; // Mirror of previous
-		pokTile2 = new byte[] {4,4,0,0,2,2,0,0, 4,4,0,0,0,0,1,1, 4,0,2,0,0,1,0,0, 4,0,2,0,0,1,1,2, 4,4,0,0,0,0,1,1, 4,4,4,0,1,0,0,0, 4,4,4,0,1,1,1,0, 4,4,4,4,0,0,0,4};
-		pokTile3 = new byte[] {0,0,2,2,0,0,4,4, 1,1,0,0,0,0,4,4, 0,0,1,0,0,2,0,4, 2,1,1,0,0,2,0,4, 1,1,0,0,0,0,4,4, 0,0,0,1,0,4,4,4, 0,1,1,1,0,4,4,4, 4,0,0,0,4,4,4,4}; // Mirror of previous
-
-		tileSet[17] = new Tile(pokTile0);
-		tileSet[18] = new Tile(pokTile1);
-		tileSet[19] = new Tile(pokTile2);
-		tileSet[20] = new Tile(pokTile3);
-		
-		testArr = new int[] {17,18,19,20};
-		
-		pokerman1 = new Sprite(testArr,2,2);
-		pokermanArr[4] = pokerman1;
-		
-		// Walk north * DONE
-		pokTile0 = new byte[] {4,4,4,4,4,4,4,4, 4,4,4,4,4,0,0,0, 4,4,4,4,0,1,1,1, 4,4,4,0,1,1,1,1, 4,4,4,0,1,1,1,1, 4,4,0,0,1,1,1,1, 4,4,0,0,0,1,1,1, 4,0,2,0,0,0,0,0};
-		pokTile1 = new byte[] {4,4,4,4,4,4,4,4, 0,0,0,4,4,4,4,4, 1,1,1,0,4,4,4,4, 1,1,1,1,0,4,4,4, 1,1,1,1,0,4,4,4, 1,1,1,1,0,0,4,4, 1,1,1,0,0,0,4,4, 0,0,0,0,0,2,0,4}; // Mirror of previous
-		pokTile2 = new byte[] {4,0,2,2,0,0,0,0, 4,0,0,0,2,2,0,0, 4,0,2,0,0,0,1,1, 4,4,0,0,0,1,0,0, 4,4,4,0,0,1,1,2, 4,4,4,4,0,0,1,1, 4,4,4,4,0,1,0,0, 4,4,4,4,4,0,0,0};
-		pokTile3 = new byte[] {0,0,0,0,2,2,0,4, 0,0,2,2,0,0,4,4, 1,1,0,0,0,0,4,4, 0,0,1,0,2,2,0,4, 2,1,1,0,2,2,0,4, 1,1,0,0,0,0,4,4, 0,0,4,4,4,4,4,4, 4,4,4,4,4,4,4,4};
-
-		tileSet[21] = new Tile(pokTile0);
-		tileSet[22] = new Tile(pokTile1);
-		tileSet[23] = new Tile(pokTile2);
-		tileSet[24] = new Tile(pokTile3);
-
-		testArr = new int[] {21,22,23,24};
-		
-		pokerman1 = new Sprite(testArr,2,2);
-		pokermanArr[5] = pokerman1;
-		
-		
-		
-		
-		
-		///////////////////////////////////////////////////////////////
-		// Creates the entity. The second line is just a duplicate to make sure it worked.
-		Entity pokerman = new Entity("Player", pokermanArr);
-		Entity pokermanDos = new Entity("Player", pokermanArr);
-		
-		// Changing spawn location of the second one.
-		pokermanDos.setLocation(90, 25);
-		
-		// Adds the entities to the entity layer. Later, there should just be a list of all entities in the game and the entity layer should just grab from that when needed.
-		EntityLayer[0] = pokerman;
-		EntityLayer[1] = pokermanDos;
+		tileSet = gameManager.getTileSet();
+		BackgroundLayer = gameManager.getBackgroundLayer();
+		EntityLayer = gameManager.getEntityLayer();
+		WindowLayer = gameManager.getWindowLayer();
 	}
 	
 	private void setColorPallete() { // I have one color pallete for testing. More coming later...

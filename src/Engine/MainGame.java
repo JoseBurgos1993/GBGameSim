@@ -10,7 +10,7 @@ import Engine.GamePanel;
  *
  */
 
-public class MainClass {
+public class MainGame {
 	
 	public static void main(String[] args) {
 		
