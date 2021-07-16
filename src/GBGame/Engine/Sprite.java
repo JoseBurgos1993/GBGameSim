@@ -1,4 +1,4 @@
-package Engine;
+package GBGame.Engine;
 
 public class Sprite {
 	private int tileSheet[]; // Will probably hold every tile, includes dupelicates.

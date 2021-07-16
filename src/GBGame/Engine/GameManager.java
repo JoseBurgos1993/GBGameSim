@@ -1,4 +1,4 @@
-package Engine;
+package GBGame.Engine;
 
 public class GameManager {
 	// This will be run at the launch. It contains all the information for the current game.
