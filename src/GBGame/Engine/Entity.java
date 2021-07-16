@@ -1,4 +1,4 @@
-package Engine;
+package GBGame.Engine;
 
 public class Entity {
 

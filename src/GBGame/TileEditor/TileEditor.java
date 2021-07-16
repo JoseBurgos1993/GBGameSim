@@ -1,4 +1,4 @@
-package TileEditor;
+package GBGame.TileEditor;
 
 import javax.swing.JFrame;
 

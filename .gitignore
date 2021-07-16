@@ -1,2 +1,4 @@
 ## Ignore bin directory contents
 bin
+maven
+target

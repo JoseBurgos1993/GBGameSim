@@ -1,4 +1,4 @@
-package TileEditor;
+package GBGame.TileEditor;
 
 import java.awt.Color;
 import java.awt.Dimension;
