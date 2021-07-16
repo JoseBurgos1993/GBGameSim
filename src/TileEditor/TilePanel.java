@@ -12,7 +12,7 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.JPanel;
 
-import com.sun.glass.events.MouseEvent;
+//import com.sun.glass.events.MouseEvent;
 
 @SuppressWarnings("serial")
 public class TilePanel extends JPanel implements Runnable, KeyListener, MouseListener{
