@@ -13,7 +13,7 @@ public class Button {
 	public boolean isNameField = false;
 	public boolean isColor = false;
 	public int tileSpot = -1;
-	public int color = 0;
+	public byte color = 0;
 	
 	public Button(int x, int y, int w, int h, String text, String action, boolean isNameField) {
 		this.x = x;

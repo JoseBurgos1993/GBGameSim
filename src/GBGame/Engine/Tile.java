@@ -13,7 +13,21 @@ public class Tile {
 		this.pixelArray = pixelArray;
 	}
 	
+	public Tile() {
+		for(int i = 0; i < 64; i++){
+			pixelArray[i] = 0;
+		}
+	}
+	
 	public byte[] getTile() {
 		return pixelArray;
+	}
+	
+	public void setTile(byte[] pixelArray) {
+		this.pixelArray = pixelArray;
+	}
+	
+	public void setPixel(int x, byte y) {
+		this.pixelArray[x] = y;
 	}
 }
