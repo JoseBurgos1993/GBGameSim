@@ -117,6 +117,7 @@ public class TilePanel extends JPanel implements Runnable, KeyListener, MouseLis
 		colorSelection[1] = new Button(600, 350, 40, 40, "", "color 1", false);
 		colorSelection[2] = new Button(600, 400, 40, 40, "", "color 2", false);
 		colorSelection[3] = new Button(600, 450, 40, 40, "", "color 3", false);
+		colorSelection[4] = new Button(600, 500, 40, 40, "", "color 4", false);
 	}
 	
 	private void doButtonAction(String action) {
@@ -154,7 +155,12 @@ public class TilePanel extends JPanel implements Runnable, KeyListener, MouseLis
 		else if(action == "color 3") {
 			System.out.println("Pressed the color 3.");
 			selectedColor = 3;
-		} else if(action == "color") {
+		}
+		else if(action == "color 4") {
+			System.out.println("Pressed the color 4.");
+			selectedColor = 4;
+		}
+		else if(action == "color") {
 			changeColor();
 		}
 	}
@@ -191,11 +197,12 @@ public class TilePanel extends JPanel implements Runnable, KeyListener, MouseLis
 			}
 			
 			g2d.setColor(Color.red);
-			g2d.fillRect(590,290,60,220);
+			g2d.fillRect(590,290,60,260);
 			colorSelection[0].drawTileColors(g2d);
 			colorSelection[1].drawTileColors(g2d);
 			colorSelection[2].drawTileColors(g2d);
 			colorSelection[3].drawTileColors(g2d);
+			colorSelection[4].drawTileColors(g2d);
 		}
 		
 	}

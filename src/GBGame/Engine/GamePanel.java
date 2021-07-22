@@ -20,7 +20,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 	// Panel Attributes \\
 	public  static int WIDTH = 160;
 	public  static int HEIGHT = 144;
-	public  static int MAGNIFICATION = 4;
+	public  static int MAGNIFICATION = 1;
 	private Thread thread;
 	private boolean running;
 	private long targetTime;
