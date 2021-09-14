@@ -9,6 +9,8 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 import javax.swing.JPanel;
 
@@ -197,7 +199,6 @@ public class TilePanel extends JPanel implements Runnable, KeyListener, MouseLis
 			colorSelection[2].drawTileColors(g2d);
 			colorSelection[3].drawTileColors(g2d);
 		}
-		
 	}
 	
 	@Override
