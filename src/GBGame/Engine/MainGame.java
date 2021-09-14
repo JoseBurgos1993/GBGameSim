@@ -1,10 +1,10 @@
-package Engine;
+package GBGame.Engine;
 
 import java.awt.Dimension;
 
 import javax.swing.JFrame;
 
-import Engine.GamePanel;
+import GBGame.Engine.GamePanel;
 /**
  * @author burgo
  *

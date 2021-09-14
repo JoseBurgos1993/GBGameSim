@@ -1,4 +1,4 @@
-package TileEditor;
+package GBGame.TileEditor;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -13,7 +13,7 @@ public class Button {
 	public boolean isNameField = false;
 	public boolean isColor = false;
 	public int tileSpot = -1;
-	public int color = 0;
+	public byte color = 0;
 	
 	public Button(int x, int y, int w, int h, String text, String action, boolean isNameField) {
 		this.x = x;
@@ -34,6 +34,9 @@ public class Button {
 		}
 		else if(action == "color 3") {
 			color = 3;
+		}
+		else if(action == "color 4") {
+			color = 4;
 		}
 	}
 	
@@ -58,17 +61,21 @@ public class Button {
 	}
 	
 	public void drawTileColors(Graphics2D g2d) {
-		g2d.setColor(Color.black);
-		g2d.drawRect(x, y, w, h);
+		//if(color != 0) {
+			g2d.setColor(Color.white);
+			g2d.drawRect(x, y, w, h);
+		//}
 		
 		switch(color) {
-			case 0: g2d.setColor(Color.white); break;
-			case 1: g2d.setColor(Color.LIGHT_GRAY); break;
-			case 2: g2d.setColor(Color.DARK_GRAY); break;
-			case 3: g2d.setColor(Color.black); break;
-			case 4: g2d.setColor(Color.green); break;
+			case 1: g2d.setColor(Color.white); break;
+			case 2: g2d.setColor(Color.LIGHT_GRAY); break;
+			case 3: g2d.setColor(Color.DARK_GRAY); break;
+			case 4: g2d.setColor(Color.black); break;
+			default: g2d.setColor(Color.green); break;
 		}
-		g2d.fillRect(x+1, y+1, w-1, h-1);
+		if(color != 0) {
+			g2d.fillRect(x+1, y+1, w-1, h-1);
+		}
 		
 	}
 	

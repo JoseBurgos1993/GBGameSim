@@ -1,4 +1,4 @@
-package Engine;
+package GBGame.Engine;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -20,7 +20,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 	// Panel Attributes \\
 	public  static int WIDTH = 160;
 	public  static int HEIGHT = 144;
-	public  static int MAGNIFICATION = 4;
+	public  static int MAGNIFICATION = 1;
 	private Thread thread;
 	private boolean running;
 	private long targetTime;
@@ -28,7 +28,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 	
 	// TEMP TESTING GRAPHICS \\ <-- TODO Will be removed when unneeded
 	private int     frame_count    = 0;
-	private Color   colorPallete[] = new Color[4]; // For more palletes, expand the array.  C = N + 4 * P, where N is the color number[1-4], P is the Pallete number[0+], and C is the index in the array. 0 is transparent.
+	private Color   colorPalette[] = new Color[4]; // For more palletes, expand the array.  C = N + 4 * P, where N is the color number[1-4], P is the Pallete number[0+], and C is the index in the array. 0 is transparent.
 	private int     chosenPallete  = 0;            // TODO For now, it doesn't do that, but this is a note to change that.
 	
 	// Layers \\
@@ -120,8 +120,8 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 	
 	private void setColorPallete() { // I have one color pallete for testing. More coming later...
 		switch(chosenPallete) {
-			case  0: colorPallete[0] = Color.black; colorPallete[1] = Color.DARK_GRAY; colorPallete[2] = Color.LIGHT_GRAY; colorPallete[3] = Color.red; break;
-			default: colorPallete[0] = Color.black; colorPallete[1] = Color.white; colorPallete[2] = Color.red; colorPallete[3] = Color.green;
+			case  0: colorPalette[0] = Color.black; colorPalette[1] = Color.DARK_GRAY; colorPalette[2] = Color.LIGHT_GRAY; colorPalette[3] = Color.red; break;
+			default: colorPalette[0] = Color.black; colorPalette[1] = Color.white; colorPalette[2] = Color.red; colorPalette[3] = Color.green;
 		}
 	}
 	
@@ -231,7 +231,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 			//	continue;
 			//}
 			
-			g2d.setColor(colorPallete[tile[i]]);
+			g2d.setColor(colorPalette[tile[i]]);
 			g2d.fillRect(tileX * MAGNIFICATION, tileY * MAGNIFICATION, MAGNIFICATION, MAGNIFICATION);
 		}
 	}
