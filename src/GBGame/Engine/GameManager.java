@@ -8,8 +8,8 @@ public class GameManager {
 	
 	// Game Data \\
 	private Tile tileSet[] = new Tile[256]; // All tiles. Panel will have all of these just because it would be a pain to do otherwise.
-	private Entity entitySet[] = new Entity[100]; // Contains all entities in the game. The panel holds copies of these (can have multiple). Panel doesn't hold entities it doesn't currently need;
-	private Entity windowSet[] = new Entity[100]; // Contains all the window entities in the game. I could bunch this in with entitySet, but I'd rather keep them separate, unless something comes up.
+	//private Entity entitySet[] = new Entity[100]; // Contains all entities in the game. The panel holds copies of these (can have multiple). Panel doesn't hold entities it doesn't currently need;
+	//private Entity windowSet[] = new Entity[100]; // Contains all the window entities in the game. I could bunch this in with entitySet, but I'd rather keep them separate, unless something comes up.
 	
 	// TEMP \\
 	private byte BackgroundLayer[] = new byte[440];

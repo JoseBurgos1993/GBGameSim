@@ -16,11 +16,13 @@ public class Entity {
 	private boolean frameDone = false;
 	private int spriteState = 2; // INT that represents the index for which sprite is active.
 	private byte frameCountdown = 0;
+	private String name = "potato";
 	
 	private int width, height; // Measured in tiles. Each tile is 8x8 pixels.
 	private int direction; // I'll make this an enum later. 0123 = NESW
 	
 	public Entity(String spriteType, Sprite[] spriteSheet) {
+		System.out.println(this.name);
 		this.spriteType = spriteType;
 		this.spriteSheet = spriteSheet;
 		if(spriteType == "Player") {
