@@ -35,7 +35,7 @@ public class Entity {
 			 * 1 = Direction (0-N, 1-E, 2-S, 3-W)
 			 * 2 = Frame Delay (Number of frames to countdown before changing state)
 			 * 3 = Next State (Once frame delay is done, this is indicates the next state to switch to)
-			 * 4 = Flip (0 for false, 1 for true. Is the sprite used a flipped version of an existing sprite?)
+			 * 4 = Flip (0 for false, 1 for true. Is the sprite using a flipped version of an existing sprite?)
 			 * 5 = Sprite (The index for which sprite is being used from the Sprite Sheet)
 			 */
 			stateTable[0][0] = 0;

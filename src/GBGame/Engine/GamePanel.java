@@ -20,7 +20,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 	// Panel Attributes \\
 	public  static int WIDTH = 160;
 	public  static int HEIGHT = 144;
-	public  static int MAGNIFICATION = 1;
+	public  static int MAGNIFICATION = 4;
 	private Thread thread;
 	private boolean running;
 	private long targetTime;
@@ -85,7 +85,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 			// For testing \\
 			//frame_count++;
 			elapsed = System.nanoTime() - startTime;
-			wait = targetTime - elapsed / 1000000;
+			wait = targetTime - elapsed / 1000000; // change to 1E9
 			
 			//if(frame_count == FRAME_RATE) {
 			//	System.out.println("Time Used = " + elapsed / 1000000 + "/" + targetTime);
