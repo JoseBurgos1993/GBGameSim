@@ -39,7 +39,7 @@ public class TilePanel extends JPanel implements Runnable, KeyListener, MouseLis
 	private Button[] tileColors = new Button[64];
 	private Button[] colorSelection = new Button[5];
 	private int pickedTile = -1;
-	private byte selectedColor = 0;
+	private byte selectedColor = 4;
 	private Color[] colorPalette = new Color[] {Color.white, Color.LIGHT_GRAY, Color.DARK_GRAY, Color.black};
 	
 	private int numberOfSavedTiles = 0;
@@ -113,7 +113,8 @@ public class TilePanel extends JPanel implements Runnable, KeyListener, MouseLis
 		//for(int i = 0; i < numberOfSavedTiles; i++) {
 		//	drawTileOnEdit(i);
 		//}
-		nameFieldActive = true;
+		//nameFieldActive = true;
+		nameFieldActive = false;
 	}
 	private void drawTileOnEdit(Graphics2D g2d, int k) {
 		//byte tile[] = tileSet[tileNum].getTile();
@@ -124,17 +125,18 @@ public class TilePanel extends JPanel implements Runnable, KeyListener, MouseLis
 		byte tile[] = savedTiles[k].getTile();
 		
 		for(int i = 0; i < tile.length; i++) {
-			if(tile[i] == 0) {
+			if(tile[i] == 4) {
 				continue;
 			}
 			xOffset = i%8;
 			yOffset = (int)i/8;
 			
-			tileX = 100+100*(k%5)+xOffset;
-			tileY = 100+100*(k/5)+yOffset;
+			tileX = 50+200*(k%5)+xOffset*5;
+			tileY = 100+200*(k/5)+yOffset*5;
 			
-			g2d.setColor(colorPalette[tile[i] - 1]);
-			g2d.fillRect(tileX, tileY, 40, 40);
+			//g2d.setColor(colorPalette[tile[i] - 1]);
+			g2d.setColor(colorPalette[tile[i]]);
+			g2d.fillRect(tileX, tileY, 4, 4);
 		}
 	}
 	private void makeEditTileScreen() {
@@ -176,11 +178,11 @@ public class TilePanel extends JPanel implements Runnable, KeyListener, MouseLis
 			}
 		}
 		
-		colorSelection[0] = new Button(600, 300, 40, 40, "", "color 0", false);
-		colorSelection[1] = new Button(600, 350, 40, 40, "", "color 1", false);
-		colorSelection[2] = new Button(600, 400, 40, 40, "", "color 2", false);
-		colorSelection[3] = new Button(600, 450, 40, 40, "", "color 3", false);
-		colorSelection[4] = new Button(600, 500, 40, 40, "", "color 4", false);
+		colorSelection[0] = new Button(600, 300, 40, 40, "", "color 0", false); // White
+		colorSelection[1] = new Button(600, 350, 40, 40, "", "color 1", false); // Light Gray
+		colorSelection[2] = new Button(600, 400, 40, 40, "", "color 2", false); // Dark Gray
+		colorSelection[3] = new Button(600, 450, 40, 40, "", "color 3", false); // Black
+		colorSelection[4] = new Button(600, 500, 40, 40, "", "color 4", false); // Transparent
 	}
 	
 	private void saveTile() {
