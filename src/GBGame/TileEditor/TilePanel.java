@@ -1,51 +1,71 @@
+/* Tile Editor
+ * TilePanel.java
+ * By Jose David Burgos
+ * 
+ * This application allows for the user to paint and save a series of 8x8 tiles, using 5 colors, the 5th being transparent. Tiles can be viewd and edited. Each tile is named.
+ * 
+ * TODO: Implement File I/O - Currently does not save any tile data, aka clean memory on each run. I want to have some sort of JSON? file that holds all data to keep continuity between sessions
+ *		 and allow for access by other applications.
+ * 
+ * TODO: Beautify - It looks ugly. Make it prettier.
+ * 
+ * TODO: Revise and Edit Code - There are methods and variables that could use with better naming and organization. It took too long to remember how this code works.
+ * 
+ * TODO: Saved Tile Screen Scroll Bar - Add a scroll bar, or arrow buttons, or whatever to the Saved Tile Screen. Needs ability to scroll through saved tiles once there are too many on the screen.
+ * 
+ */
+
 package GBGame.TileEditor;
 
 import GBGame.Engine.Tile;
-
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 
 import javax.swing.JPanel;
 
-//import com.sun.glass.events.MouseEvent;
-
 @SuppressWarnings("serial")
 public class TilePanel extends JPanel implements Runnable, KeyListener, MouseListener{
-	// Panel Attributes \\
+	
+	//----- Panel Attributes -----\\
 	public static Graphics2D g2d;
 	private BufferedImage image;
 	private boolean running;
 	private Thread thread;
 	private long targetTime;
 	private static final int FRAME_RATE = 60;
-	private String state = "MainMenu";
 	
-	// Buttons \\
-	private Button buttonList[] = new Button[3];
-	private Button activeButton = new Button();
-	private boolean nameFieldActive = false;
-	private String nameFieldText = "";
+	//----- Variables -----\\
+	private int      numberOfSavedTiles = 0; // Tracks how many tiles are saved in savedTiles, since it's array length is predetermined.
+	private int      editTileIndex = 0; // Follows which tile is being edited on Edit Tile Page. Value related to in in savedTiles.
+	private int      selectedTile = -1; // Follows which tile was clicked on the Saved Tile Page. Value related to index in savedTiles? (Need to check that one). -1 means nothing is selected.
 	
-	// Tiles \\
-	private Button[] tileColors = new Button[64];
-	private Button[] colorSelection = new Button[5];
-	private int pickedTile = -1;
-	private byte selectedColor = 4;
-	private Color[] colorPalette = new Color[] {Color.white, Color.LIGHT_GRAY, Color.DARK_GRAY, Color.black};
+	private byte     selectedColor = 4; // What color is currently selected while painting. Defaults to 4 (black) because why not. Value related to colorPalette.
 	
-	private int numberOfSavedTiles = 0;
-	private int editTileIndex = 0;
-	private Tile[] savedTiles = new Tile[256]; // Remember, it uses Bytes, not Ints.
-	private String[] savedTileNames = new String[256];
+	private boolean  nameFieldActive = false; // Whether or not the namefield is active on the screen or not.
+	
+	//private String   state = "MainMenu"; // Panel Starting State
+	private int      state;
+	private String   nameFieldText = ""; // Name Field Text.
+	private String[] savedTileNames = new String[256]; // String arry of saved tile names.
+	
+	private Button   buttonList[]; // Array of buttons.
+	private Button   activeButton = new Button(); // Which button is currently active. Used for mouse clicking.
+	private Button[] tileColors; // Button array for the 8x8 tile on the Create New Tile or Edit Tile pages.
+	private Button[] colorSelection = new Button[5]; // Button array for the 5 colors (5th is transparent/erase) on the Create New Tile or Edit Tile pages.
+	private Button[] tileButtons;
+	
+	private Tile[]   savedTiles = new Tile[256]; // Remember, Tiles use Bytes, not Ints.
+	
+	private Color[]  colorPalette = new Color[] {Color.white, Color.LIGHT_GRAY, Color.DARK_GRAY, Color.black}; // 4 colors used for painting. Doesn't affect colors on Saved Tile screen. That is in Button.java.
+
+	
+	//----- System -----\\
 	
 	public TilePanel() {
 		setPreferredSize(new Dimension(800, 600));
@@ -96,62 +116,54 @@ public class TilePanel extends JPanel implements Runnable, KeyListener, MouseLis
 		makeMainMenu();
 	}
 	
+	//----- Pages -----\\
+	
+	// Main Menu
 	private void makeMainMenu() {
-		state = "MainMenu";
+		//state = "MainMenu";
+		state = 1;
+		
 		buttonList = new Button[3];
 		tileColors = new Button[64];
 		buttonList[0] = new Button(100,350, 100, 50, "Create", "gotoCreate", false);
-		buttonList[1] = new Button(300,350, 100, 50, "Edit", "Edit1", false);
+		buttonList[1] = new Button(300,350, 100, 50, "View Saved", "gotoSaved", false);
 		buttonList[2] = new Button(500,350, 100, 50, "Leave", "Leave", false);
 		nameFieldActive = false;
 	}
-	private void makeEditSelect() {
-		state = "Edit1";
+	
+	// View Saved Tiles
+	private void makeSavedTilePage() {
+		//state = "Edit1";
+		state = 2;
 		buttonList = new Button[2];
 		buttonList[0] = new Button(680,20, 100, 50, "Back", "gotoMainMenu", false);
-		buttonList[1] = new Button(680,200, 100, 50, "Edit Tile", "Edit2", false);
-		//for(int i = 0; i < numberOfSavedTiles; i++) {
-		//	drawTileOnEdit(i);
-		//}
+		buttonList[1] = new Button(680,200, 100, 50, "Edit Tile", "gotoEdit", false);
+		tileButtons = new Button[numberOfSavedTiles];
+		for(int i = 0; i < numberOfSavedTiles; i++) {
+			tileButtons[i] = new Button(50+200*(i%5),100+200*(i/5), 40, 40, "", "clickTile", false);
+			tileButtons[i].tileSpot = i;
+		}
 		//nameFieldActive = true;
 		nameFieldActive = false;
 	}
-	private void drawTileOnEdit(Graphics2D g2d, int k) {
-		//byte tile[] = tileSet[tileNum].getTile();
-		int tileX, tileY = 0;
-		int xOffset = 0;
-		int yOffset = 0;
-		
-		byte tile[] = savedTiles[k].getTile();
-		
-		for(int i = 0; i < tile.length; i++) {
-			if(tile[i] == 4) {
-				continue;
-			}
-			xOffset = i%8;
-			yOffset = (int)i/8;
-			
-			tileX = 50+200*(k%5)+xOffset*5;
-			tileY = 100+200*(k/5)+yOffset*5;
-			
-			//g2d.setColor(colorPalette[tile[i] - 1]);
-			g2d.setColor(colorPalette[tile[i]]);
-			g2d.fillRect(tileX, tileY, 4, 4);
-		}
-	}
+	
+	// Edit Screen
 	private void makeEditTileScreen() {
-		state = "Edit2";
+		//state = "Edit2";
+		state = 3;
 		buttonList = new Button[3];
-		buttonList[0] = new Button(680,20, 100, 50, "Back", "gotoMainMenu", false);
+		buttonList[0] = new Button(680,20, 100, 50, "Back", "gotoSaved", false);
 		buttonList[1] = new Button(680,200,100,50, "Save", "Save", false);
 		buttonList[2] = new Button(10,10,200,50, "", "clickedNameField", true);
 		nameFieldActive = true;
-
+		nameFieldText = savedTileNames[editTileIndex];
+		buttonList[2].text = nameFieldText;
 		tileColors = new Button[64];
 
 		for(int i = 0; i < 8; i++) { // Vertical
 			for(int j = 0; j < 8; j++) { // Horizonal
-				tileColors[j+i*8] = new Button(40+42*j, 100+42*i, 40, 40, "", "color", false);
+				tileColors[j+i*8] = new Button(40+42*j, 100+42*i, 40, 40, "", "paint", false);
+				tileColors[j+i*8].color = savedTiles[editTileIndex].getPixel(j+i*8);
 			}
 		}
 		
@@ -162,19 +174,22 @@ public class TilePanel extends JPanel implements Runnable, KeyListener, MouseLis
 		colorSelection[4] = new Button(600, 500, 40, 40, "", "color 4", false);
 	}
 	
+	// Create New Tile Screen (Very similar to edit screen)
 	private void makeCreateScreen() {
-		state = "Create";
+		//state = "Create";
+		state = 4;
 		buttonList = new Button[3];
 		buttonList[0] = new Button(680,20, 100, 50, "Back", "gotoMainMenu", false);
 		buttonList[1] = new Button(680,200,100,50, "Save", "Save", false);
 		buttonList[2] = new Button(10,10,200,50, "", "clickedNameField", true);
 		nameFieldActive = true;
-
+		nameFieldText = "";
+		
 		tileColors = new Button[64];
 
 		for(int i = 0; i < 8; i++) { // Vertical
 			for(int j = 0; j < 8; j++) { // Horizonal
-				tileColors[j+i*8] = new Button(40+42*j, 100+42*i, 40, 40, "", "color", false);
+				tileColors[j+i*8] = new Button(40+42*j, 100+42*i, 40, 40, "", "paint", false);
 			}
 		}
 		
@@ -185,17 +200,54 @@ public class TilePanel extends JPanel implements Runnable, KeyListener, MouseLis
 		colorSelection[4] = new Button(600, 500, 40, 40, "", "color 4", false); // Transparent
 	}
 	
+	//----- Methods -----\\
+	
+	// Method that draws the tiles in the saved view page
+	private void drawTileOnEdit(Graphics2D g2d, int k) {
+		int tileX, tileY = 0;
+		int xOffset = 0;
+		int yOffset = 0;
+		
+		byte tile[] = savedTiles[k].getTile();
+		
+		for(int i = 0; i < tile.length; i++) {
+			if(tile[i] == 4) {
+				continue;
+			}
+			xOffset = i%8 * 6;
+			yOffset = (int)i/8 * 6;
+			
+			tileX = 50+200*(k%5) + xOffset;
+			tileY = 100+200*(k/5) + yOffset;
+			
+
+			
+			g2d.setColor(colorPalette[tile[i]]);
+			g2d.fillRect(tileX, tileY, 4, 4);
+			//if(tile[i] == 0) {
+			//	g2d.setColor(Color.black);
+			//} else {
+			g2d.setColor(colorPalette[tile[i]]);
+			//}
+			g2d.drawRect(tileX, tileY, 4, 4);
+		}
+	}
+	
+	// Saves Tile On Creation And Edit Pages
 	private void saveTile() {
 		if(nameFieldText != "") {
 			Tile temp = new Tile();
 			for(int i = 0; i < 64; i++) {
 				temp.setPixel(i, tileColors[i].color);
 			}
+			savedTileNames[editTileIndex] = nameFieldText;
+			nameFieldText = "";
 			savedTiles[editTileIndex] = temp;
-			numberOfSavedTiles++;
+			if(state == 4) numberOfSavedTiles++;
 		}
 	}
 	
+	// Handles Button Actions
 	private void doButtonAction(String action) {
 		if(action == "Leave") {
 			System.exit(0);
@@ -207,56 +259,51 @@ public class TilePanel extends JPanel implements Runnable, KeyListener, MouseLis
 		else if(action == "gotoMainMenu") {
 			makeMainMenu();
 		}
+		else if(action == "gotoSaved") {
+			makeSavedTilePage();
+		}
+		else if(action == "gotoEdit") {
+			System.out.println("Trying to edit selected tile.");
+			if(selectedTile != -1) {
+				editTileIndex = selectedTile;
+				makeEditTileScreen();
+			}
+		}
 		else if(action == "Save") {
-			System.out.println("Pressed the save button.");
 			saveTile();
 			makeMainMenu();
 		}
-		else if(action == "Edit1") {
-			System.out.println("Pressed the edit button.");
-			makeEditSelect();
-		}
-		else if(action == "Edit2") {
-			System.out.println("Pressed the edit button.");
-			makeEditTileScreen();
-		}
 		else if(action == "clickedNameField") {
-			System.out.println("Pressed the name field.");
 			nameFieldActive = true;
 		}
 		else if(action == "color 0") {
-			System.out.println("Pressed the color 0.");
 			selectedColor = 0;
 		}
 		else if(action == "color 1") {
-			System.out.println("Pressed the color 1.");
 			selectedColor = 1;
 		}
 		else if(action == "color 2") {
-			System.out.println("Pressed the color 2.");
 			selectedColor = 2;
 		}
 		else if(action == "color 3") {
-			System.out.println("Pressed the color 3.");
 			selectedColor = 3;
 		}
 		else if(action == "color 4") {
-			System.out.println("Pressed the color 4.");
 			selectedColor = 4;
 		}
-		else if(action == "color") {
-			changeColor();
+		else if(action == "paint") {
+			activeButton.color = selectedColor;
 		}
 	}
 	
-	private void changeColor() {
-		activeButton.color = selectedColor;
-	}
+	//----- Rendering -----\\
 	
+	// Update method is empty
 	private void update() {
 		
 	}
 	
+	// Request Render
 	private void requestRender() {
 		render(g2d);
 		Graphics g = getGraphics();
@@ -264,8 +311,12 @@ public class TilePanel extends JPanel implements Runnable, KeyListener, MouseLis
 		g.dispose();
 	}
 	
+	// Render
 	private void render(Graphics2D g2d) {
+		// Clear Screen
 		g2d.clearRect(0, 0, 800, 600);
+		
+		// Draws Buttons
 		for(Button b : buttonList) {
 			if(b.isNameField) {
 				b.drawNameField(g2d);
@@ -273,36 +324,64 @@ public class TilePanel extends JPanel implements Runnable, KeyListener, MouseLis
 				b.drawButton(g2d);
 			}
 		}
-		if(state == "Create") {
-			g2d.setColor(Color.red);
-			g2d.fillRect(30,90,334,334);
-			for(Button b : tileColors) {
-				b.drawTileColors(g2d);
+		
+		switch(state) {
+			case 2: { // Saved Tiles
+				//g2d.setColor(Color.white);
+				g2d.setColor(new Color(185, 122, 87));
+				g2d.fillRect(30,90,600,600);
+				for(int i = 0; i < numberOfSavedTiles; i++) {
+					drawTileOnEdit(g2d, i);
+					if(selectedTile == i) {
+						g2d.setColor(Color.green);
+					} else {
+						g2d.setColor(Color.black);
+					}
+					g2d.drawRect(tileButtons[i].x - 2, tileButtons[i].y - 2, 50, 50);
+				}
+				break;
 			}
-			
-			g2d.setColor(Color.red);
-			g2d.fillRect(590,290,60,260);
-			colorSelection[0].drawTileColors(g2d);
-			colorSelection[1].drawTileColors(g2d);
-			colorSelection[2].drawTileColors(g2d);
-			colorSelection[3].drawTileColors(g2d);
-			colorSelection[4].drawTileColors(g2d);
-		}
-		if(state == "Edit1") {
-			g2d.setColor(Color.red);
-			g2d.fillRect(30,90,600,600);
-			for(int i = 0; i < numberOfSavedTiles; i++) {
-				drawTileOnEdit(g2d, i);
+			case 3: { // Edit Tile
+				g2d.setColor(Color.red);
+				g2d.fillRect(30,90,334,334);
+				for(Button b : tileColors) {
+					b.drawTileColors(g2d);
+				}
+				
+				g2d.setColor(Color.red);
+				g2d.fillRect(590,290,60,260);
+				colorSelection[0].drawTileColors(g2d);
+				colorSelection[1].drawTileColors(g2d);
+				colorSelection[2].drawTileColors(g2d);
+				colorSelection[3].drawTileColors(g2d);
+				colorSelection[4].drawTileColors(g2d);
+				break;
 			}
+			case 4: { // Create New Tile
+				g2d.setColor(Color.red);
+				
+				g2d.fillRect(30,90,334,334);
+				
+				for(Button b : tileColors) {
+					b.drawTileColors(g2d);
+				}
+				
+				g2d.setColor(Color.red);
+				g2d.fillRect(590,290,60,260);
+				colorSelection[0].drawTileColors(g2d);
+				colorSelection[1].drawTileColors(g2d);
+				colorSelection[2].drawTileColors(g2d);
+				colorSelection[3].drawTileColors(g2d);
+				colorSelection[4].drawTileColors(g2d);
+				break;
+			}
+			default: break; // Bad State
 		}
 	}
 	
-	@Override
-	public void keyPressed(KeyEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
+	//----- Mouse And Keyboard Controls -----\\
+	
+	// Release Key
 	@Override
 	public void keyReleased(KeyEvent e) {
 		char key = e.getKeyChar();
@@ -335,28 +414,7 @@ public class TilePanel extends JPanel implements Runnable, KeyListener, MouseLis
 		}
 	}
 
-	@Override
-	public void keyTyped(KeyEvent e) {
-		
-	}
-
-	@Override
-	public void mouseClicked(java.awt.event.MouseEvent arg0) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void mouseEntered(java.awt.event.MouseEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void mouseExited(java.awt.event.MouseEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
+	// Press Mouse
 	@Override
 	public void mousePressed(java.awt.event.MouseEvent e) {
 		int x = e.getX();
@@ -367,7 +425,8 @@ public class TilePanel extends JPanel implements Runnable, KeyListener, MouseLis
 				activeButton = b;
 			}
 		}
-		if(state == "Create") {
+		
+		if(state == 3 || state == 4) { // Create or Edit Tile Page
 			for(Button b : tileColors) {
 				if(x > b.x && x < b.x + b.w && y > b.y && y < b.y + b.h) {
 					b.pressed = true;
@@ -380,10 +439,18 @@ public class TilePanel extends JPanel implements Runnable, KeyListener, MouseLis
 					activeButton = b;
 				}
 			}
+		} else if(state == 2) { // Saved Tile Page
+			for(Button b : tileButtons) {
+				if(x > b.x && x < b.x + b.w && y > b.y && y < b.y + b.h) {
+					System.out.println("Tile " + b.tileSpot + " was clicked");
+					b.pressed = true;
+					activeButton = b;
+				}
+			}
 		}
-		
 	}
 
+	// Release Mouse
 	@Override
 	public void mouseReleased(java.awt.event.MouseEvent e) {
 		int x = e.getX();
@@ -392,8 +459,33 @@ public class TilePanel extends JPanel implements Runnable, KeyListener, MouseLis
 		
 		if(x > activeButton.x && x < activeButton.x + activeButton.w && y > activeButton.y && y < activeButton.y + activeButton.h) {
 			doButtonAction(activeButton.action);
+			if(activeButton.action == "clickTile") {
+				selectedTile = activeButton.tileSpot;
+			}
 		} else {
 			nameFieldActive = false;
 		}
+	}
+	
+	// Unused
+
+	@Override
+	public void keyPressed(KeyEvent arg0) {
+	}
+	
+	@Override
+	public void keyTyped(KeyEvent e) {
+	}
+
+	@Override
+	public void mouseClicked(java.awt.event.MouseEvent arg0) {
+	}
+
+	@Override
+	public void mouseEntered(java.awt.event.MouseEvent arg0) {
+	}
+
+	@Override
+	public void mouseExited(java.awt.event.MouseEvent arg0) {
 	}
 }

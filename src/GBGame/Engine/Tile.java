@@ -27,6 +27,9 @@ public class Tile {
 		this.pixelArray = pixelArray;
 	}
 	
+	public byte getPixel(int x) {
+		return pixelArray[x];
+	}
 	public void setPixel(int x, byte y) {
 		this.pixelArray[x] = y;
 	}

@@ -71,7 +71,7 @@ public class Button {
 			case 1: g2d.setColor(Color.LIGHT_GRAY); break;
 			case 2: g2d.setColor(Color.DARK_GRAY); break;
 			case 3: g2d.setColor(Color.black); break;
-			default: g2d.setColor(Color.green); break;
+			default: g2d.setColor(Color.yellow); break;
 		}
 		if(color != 4) {
 			g2d.fillRect(x+1, y+1, w-1, h-1);
