@@ -38,19 +38,18 @@ public class TilePanel extends JPanel implements Runnable, KeyListener, MouseLis
 	private boolean running;
 	private Thread thread;
 	private long targetTime;
-	private static final int FRAME_RATE = 60;
+	private static final int FRAME_RATE = 25;
 	
 	//----- Variables -----\\
 	private int      numberOfSavedTiles = 0; // Tracks how many tiles are saved in savedTiles, since it's array length is predetermined.
-	private int      editTileIndex = 0; // Follows which tile is being edited on Edit Tile Page. Value related to in in savedTiles.
+	private int      editTileIndex = 0; // Follows which tile is being edited on Edit Tile Page. Value related to index in in savedTiles.
 	private int      selectedTile = -1; // Follows which tile was clicked on the Saved Tile Page. Value related to index in savedTiles? (Need to check that one). -1 means nothing is selected.
 	
 	private byte     selectedColor = 4; // What color is currently selected while painting. Defaults to 4 (black) because why not. Value related to colorPalette.
 	
 	private boolean  nameFieldActive = false; // Whether or not the namefield is active on the screen or not.
 	
-	//private String   state = "MainMenu"; // Panel Starting State
-	private int      state;
+	private int      state; // What page we are on
 	private String   nameFieldText = ""; // Name Field Text.
 	private String[] savedTileNames = new String[256]; // String arry of saved tile names.
 	
