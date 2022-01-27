@@ -45,12 +45,12 @@ public class TilePanel extends JPanel implements Runnable, KeyListener, MouseLis
 	private int      editTileIndex = 0; // Follows which tile is being edited on Edit Tile Page. Value related to index in in savedTiles.
 	private int      selectedTile = -1; // Follows which tile was clicked on the Saved Tile Page. Value related to index in savedTiles? (Need to check that one). -1 means nothing is selected.
 	
-	private byte     selectedColor = 4; // What color is currently selected while painting. Defaults to 4 (black) because why not. Value related to colorPalette.
+	private byte     selectedColor = 3; // What color is currently selected while painting. Defaults to 3 (black) because why not. Value related to colorPalette.
 	
 	private boolean  nameFieldActive = false; // Whether or not the namefield is active on the screen or not.
 	
 	private int      state; // What page we are on
-	private String   nameFieldText = ""; // Name Field Text.
+	private String   nameFieldText = ""; // Name Field Text. Tile names are limited to 20 characters.
 	private String[] savedTileNames = new String[256]; // String arry of saved tile names.
 	
 	private Button   buttonList[]; // Array of buttons.
@@ -134,12 +134,16 @@ public class TilePanel extends JPanel implements Runnable, KeyListener, MouseLis
 	private void makeSavedTilePage() {
 		//state = "Edit1";
 		state = 2;
-		buttonList = new Button[2];
+		nameFieldText = "";
+		selectedTile = -1;
+		buttonList = new Button[4];
 		buttonList[0] = new Button(680,20, 100, 50, "Back", "gotoMainMenu", false);
 		buttonList[1] = new Button(680,200, 100, 50, "Edit Tile", "gotoEdit", false);
+		buttonList[2] = new Button(600,90, 50, 50, "Up", "gotoMainMenu", false);
+		buttonList[3] = new Button(600,160, 50, 50, "Down", "gotoMainMenu", false);
 		tileButtons = new Button[numberOfSavedTiles];
 		for(int i = 0; i < numberOfSavedTiles; i++) {
-			tileButtons[i] = new Button(50+200*(i%5),100+200*(i/5), 40, 40, "", "clickTile", false);
+			tileButtons[i] = new Button(50+53*(i%10),100+53*(i/10), 40, 40, "", "clickTile", false);
 			tileButtons[i].tileSpot = i;
 		}
 		//nameFieldActive = true;
@@ -216,8 +220,8 @@ public class TilePanel extends JPanel implements Runnable, KeyListener, MouseLis
 			xOffset = i%8 * 6;
 			yOffset = (int)i/8 * 6;
 			
-			tileX = 50+200*(k%5) + xOffset;
-			tileY = 100+200*(k/5) + yOffset;
+			tileX = 50+53*(k%10) + xOffset;
+			tileY = 100+53*(k/10) + yOffset;
 			
 
 			
@@ -327,8 +331,14 @@ public class TilePanel extends JPanel implements Runnable, KeyListener, MouseLis
 		switch(state) {
 			case 2: { // Saved Tiles
 				//g2d.setColor(Color.white);
-				g2d.setColor(new Color(185, 122, 87));
-				g2d.fillRect(30,90,600,600);
+				g2d.setColor(new Color(185, 122, 87)); // Brown
+				g2d.fillRect(30,90,540,500);
+				
+				
+				g2d.setColor(Color.LIGHT_GRAY);
+				g2d.drawString(nameFieldText, 20, 20);
+				//g2d.fillRect(600,90,30,500);
+				
 				for(int i = 0; i < numberOfSavedTiles; i++) {
 					drawTileOnEdit(g2d, i);
 					if(selectedTile == i) {
@@ -393,7 +403,7 @@ public class TilePanel extends JPanel implements Runnable, KeyListener, MouseLis
 			if(e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
 				System.out.println("Pressed back space");
 				nameFieldText = nameFieldText.substring(0, nameFieldText.length() - 1);
-			} else{
+			} else if(e.getKeyCode() != KeyEvent.VK_SHIFT && e.getKeyCode() != KeyEvent.VK_CAPS_LOCK){
 				System.out.println(key);
 				nameFieldText += key;
 			}
@@ -439,11 +449,15 @@ public class TilePanel extends JPanel implements Runnable, KeyListener, MouseLis
 				}
 			}
 		} else if(state == 2) { // Saved Tile Page
-			for(Button b : tileButtons) {
+			Button b;
+			for(int i = 0; i < tileButtons.length; i++) {
+				b = tileButtons[i];
+			//for(Button b : tileButtons) {
 				if(x > b.x && x < b.x + b.w && y > b.y && y < b.y + b.h) {
 					System.out.println("Tile " + b.tileSpot + " was clicked");
 					b.pressed = true;
 					activeButton = b;
+					nameFieldText = savedTileNames[i];
 				}
 			}
 		}
