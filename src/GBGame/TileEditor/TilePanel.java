@@ -26,6 +26,10 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
+import java.util.Iterator;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import javax.swing.JPanel;
 
@@ -62,7 +66,8 @@ public class TilePanel extends JPanel implements Runnable, KeyListener, MouseLis
 	private Tile[]   savedTiles = new Tile[256]; // Remember, Tiles use Bytes, not Ints.
 	
 	private Color[]  colorPalette = new Color[] {Color.white, Color.LIGHT_GRAY, Color.DARK_GRAY, Color.black}; // 4 colors used for painting. Doesn't affect colors on Saved Tile screen. That is in Button.java.
-
+	
+	private JsonReadWrite json = new JsonReadWrite();
 	
 	//----- System -----\\
 	
@@ -112,6 +117,38 @@ public class TilePanel extends JPanel implements Runnable, KeyListener, MouseLis
 		image = new BufferedImage(800, 600, BufferedImage.TYPE_INT_ARGB);
 		g2d = image.createGraphics();
 		running = true;
+		
+		JSONObject obj = json.readFromFile();
+		//System.out.println(obj);
+		Iterator<String> keys = obj.keys();
+		Tile tile = new Tile();
+		JSONArray jsonArray = new JSONArray();
+		int[] temp1;
+		byte[] temp2;
+		
+		while(keys.hasNext()) {
+			String key = keys.next();
+			if(obj.get(key) instanceof JSONArray) {
+				//System.out.println("key = " + key);
+				savedTileNames[numberOfSavedTiles] = (String) key;
+				//System.out.println("obj.get(key) = " + obj.get(key));
+				jsonArray = (JSONArray) obj.get(key);
+				temp1 = new int[64];
+				temp2 = new byte[64];
+				
+				for(int i = 0; i < 64; i++) {
+					temp1[i] = (int) jsonArray.get(i);
+					temp2[i] = (byte) temp1[i];
+				}
+				
+				tile = new Tile(temp2);
+				savedTiles[numberOfSavedTiles] = tile;
+				numberOfSavedTiles++;
+			}
+		}
+		
+		
+		
 		makeMainMenu();
 	}
 	
@@ -247,6 +284,35 @@ public class TilePanel extends JPanel implements Runnable, KeyListener, MouseLis
 			nameFieldText = "";
 			savedTiles[editTileIndex] = temp;
 			if(state == 4) numberOfSavedTiles++;
+			
+			JSONObject obj = new JSONObject();
+			JSONArray list;
+			for(int i = 0; i < numberOfSavedTiles; i++) {
+				list = new JSONArray();
+				for(int j = 0; j < 64; j++) {
+					list.put(savedTiles[i].getPixel(j));
+				}
+				obj.put(savedTileNames[i], list);
+			}
+			
+			json.writeToFile(obj);
+			
+			/*
+			JSONObject obj = new JSONObject();
+			
+			obj.put("name", "Abhishek Sharma");
+			obj.put("department","B.E");
+			obj.put("branch", "C.S.E");
+			obj.put("year", 3);
+
+			JSONArray list = new JSONArray();
+			
+			list.put("remark 1");
+			list.put("remark 2");
+			list.put("remark 3");
+			
+			obj.put("remarks", list);//adding the list to our JSON Object
+			*/
 		}
 	}
 	
