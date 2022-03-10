@@ -1,5 +1,6 @@
 package GBGame.Engine;
 
+import GBGame.TileEditor.JsonReadWrite;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -9,8 +10,12 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
+import java.util.Iterator;
 
 import javax.swing.JPanel;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 
 
@@ -20,11 +25,11 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 	// Panel Attributes \\
 	public  static int WIDTH = 160;
 	public  static int HEIGHT = 144;
-	public  static int MAGNIFICATION = 4;
+	public  static int MAGNIFICATION = 1;
 	private Thread thread;
 	private boolean running;
 	private long targetTime;
-	private static final int FRAME_RATE = 60;
+	private static final int FRAME_RATE = 60; // Maybe I should have a seperate cycle rate and frame rate
 	
 	// TEMP TESTING GRAPHICS \\ <-- TODO Will be removed when unneeded
 	private int     frame_count    = 0;
@@ -43,9 +48,10 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 	private Sprite WindowLayer[];// = new Sprite[440]; // TODO Figure out how I want the window layer to work. It should probably be changed to sprites since some UI elements are animated.
 	private byte FinalPixelColors[] = new byte [23040];
 	
-	// Game Elements \\
+	// Game Data \\
 	private GameManager gameManager; // TODO This contains the game data. Will probably rename it. Maybe even call something else game manager.
-	
+	//private JsonReadWrite jsonReadWrite = new JsonReadWrite();
+
 	// Render \\
 	public static Graphics2D g2d;
 	private BufferedImage image;
@@ -109,18 +115,53 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 		g2d = image.createGraphics();
 		running = true;
 		
-		// Sets the color pallete
 		setColorPallete();
 		gameManager = new GameManager();
+		
 		tileSet = gameManager.getTileSet();
+		//readFileData();
+		
+		
 		BackgroundLayer = gameManager.getBackgroundLayer();
 		EntityLayer = gameManager.getEntityLayer();
 		WindowLayer = gameManager.getWindowLayer();
 	}
-	
+	/*
+	private void readFileData() {
+		JSONObject json = jsonReadWrite.readFromFile("./tiles.json");
+		Iterator<String> keys = json.keys();
+		Tile tile = new Tile();
+		JSONArray jsonArray = new JSONArray();
+		int[] temp1;
+		byte[] temp2;
+		int n = 0;
+		
+		while(keys.hasNext()) {
+			String key = keys.next();
+			if(json.get(key) instanceof JSONArray) {
+				//savedTileNames[numberOfSavedTiles] = (String) key;
+				jsonArray = (JSONArray) json.get(key);
+				
+				temp1 = new int[64];
+				temp2 = new byte[64];
+				
+				for(int i = 0; i < 64; i++) {
+					temp1[i] = (int) jsonArray.get(i);
+					temp2[i] = (byte) temp1[i];
+				}
+				
+				tile = new Tile(temp2);
+				//savedTiles[numberOfSavedTiles] = tile;
+				tileSet[n] = tile;
+				n++;
+			}
+		}
+	}
+	*/
 	private void setColorPallete() { // I have one color pallete for testing. More coming later...
 		switch(chosenPallete) {
-			case  0: colorPalette[0] = Color.black; colorPalette[1] = Color.DARK_GRAY; colorPalette[2] = Color.LIGHT_GRAY; colorPalette[3] = Color.red; break;
+			//case  0: colorPalette[0] = Color.black; colorPalette[1] = Color.DARK_GRAY; colorPalette[2] = Color.LIGHT_GRAY; colorPalette[3] = Color.red; break;
+			case  0: colorPalette[0] = Color.white; colorPalette[1] = Color.LIGHT_GRAY; colorPalette[2] = Color.DARK_GRAY; colorPalette[3] = Color.black; break;
 			default: colorPalette[0] = Color.black; colorPalette[1] = Color.white; colorPalette[2] = Color.red; colorPalette[3] = Color.green;
 		}
 	}

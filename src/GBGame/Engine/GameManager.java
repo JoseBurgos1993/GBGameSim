@@ -1,10 +1,19 @@
 package GBGame.Engine;
 
+import java.util.Iterator;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import GBGame.TileEditor.JsonReadWrite;
+
 public class GameManager {
 	// This will be run at the launch. It contains all the information for the current game.
 	// My hope is that most everything else can be used for any type of game for this style,
 	// But classes like this one load the specific information for that particular game.
 	// For example, one might be for a Mario-like game, another for a RPG.
+
+	private JsonReadWrite jsonReadWrite = new JsonReadWrite();
 	
 	// Game Data \\
 	private Tile tileSet[] = new Tile[256]; // All tiles. Panel will have all of these just because it would be a pain to do otherwise.
@@ -23,6 +32,7 @@ public class GameManager {
 		
 		// Read tileset
 		createTiles();
+		readFileData();
 		// Read sprite data
 		
 		// Read entity data
@@ -31,7 +41,36 @@ public class GameManager {
 		
 		// Return that to GamePanel? Or no, maybe this class can handle it. GamePanel can handle the graphics, sound, window, etc.
 	}
-	
+	private void readFileData() {
+		JSONObject json = jsonReadWrite.readFromFile("./tiles.json");
+		Iterator<String> keys = json.keys();
+		Tile tile = new Tile();
+		JSONArray jsonArray = new JSONArray();
+		int[] temp1;
+		byte[] temp2;
+		int n = 0;
+		
+		while(keys.hasNext()) {
+			String key = keys.next();
+			if(json.get(key) instanceof JSONArray) {
+				//savedTileNames[numberOfSavedTiles] = (String) key;
+				jsonArray = (JSONArray) json.get(key);
+				
+				temp1 = new int[64];
+				temp2 = new byte[64];
+				
+				for(int i = 0; i < 64; i++) {
+					temp1[i] = (int) jsonArray.get(i);
+					temp2[i] = (byte) temp1[i];
+				}
+				
+				tile = new Tile(temp2);
+				//savedTiles[numberOfSavedTiles] = tile;
+				tileSet[n] = tile;
+				n++;
+			}
+		}
+	}
 	private void createTiles(){
 		// Creates Background Tile (the smiley face)
 		byte tile1[] = new byte[64];

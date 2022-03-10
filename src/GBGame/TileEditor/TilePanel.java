@@ -48,6 +48,7 @@ public class TilePanel extends JPanel implements Runnable, KeyListener, MouseLis
 	private int      numberOfSavedTiles = 0; // Tracks how many tiles are saved in savedTiles, since it's array length is predetermined.
 	private int      editTileIndex = 0; // Follows which tile is being edited on Edit Tile Page. Value related to index in in savedTiles.
 	private int      selectedTile = -1; // Follows which tile was clicked on the Saved Tile Page. Value related to index in savedTiles? (Need to check that one). -1 means nothing is selected.
+	private int      scrollBarRow = 0;
 	
 	private byte     selectedColor = 3; // What color is currently selected while painting. Defaults to 3 (black) because why not. Value related to colorPalette.
 	
@@ -67,7 +68,7 @@ public class TilePanel extends JPanel implements Runnable, KeyListener, MouseLis
 	
 	private Color[]  colorPalette = new Color[] {Color.white, Color.LIGHT_GRAY, Color.DARK_GRAY, Color.black}; // 4 colors used for painting. Doesn't affect colors on Saved Tile screen. That is in Button.java.
 	
-	private JsonReadWrite json = new JsonReadWrite();
+	private JsonReadWrite jsonReadWrite = new JsonReadWrite();
 	
 	//----- System -----\\
 	
@@ -118,37 +119,7 @@ public class TilePanel extends JPanel implements Runnable, KeyListener, MouseLis
 		g2d = image.createGraphics();
 		running = true;
 		
-		JSONObject obj = json.readFromFile();
-		//System.out.println(obj);
-		Iterator<String> keys = obj.keys();
-		Tile tile = new Tile();
-		JSONArray jsonArray = new JSONArray();
-		int[] temp1;
-		byte[] temp2;
-		
-		while(keys.hasNext()) {
-			String key = keys.next();
-			if(obj.get(key) instanceof JSONArray) {
-				//System.out.println("key = " + key);
-				savedTileNames[numberOfSavedTiles] = (String) key;
-				//System.out.println("obj.get(key) = " + obj.get(key));
-				jsonArray = (JSONArray) obj.get(key);
-				temp1 = new int[64];
-				temp2 = new byte[64];
-				
-				for(int i = 0; i < 64; i++) {
-					temp1[i] = (int) jsonArray.get(i);
-					temp2[i] = (byte) temp1[i];
-				}
-				
-				tile = new Tile(temp2);
-				savedTiles[numberOfSavedTiles] = tile;
-				numberOfSavedTiles++;
-			}
-		}
-		
-		
-		
+		readFromFile();
 		makeMainMenu();
 	}
 	
@@ -169,21 +140,20 @@ public class TilePanel extends JPanel implements Runnable, KeyListener, MouseLis
 	
 	// View Saved Tiles
 	private void makeSavedTilePage() {
-		//state = "Edit1";
 		state = 2;
 		nameFieldText = "";
 		selectedTile = -1;
 		buttonList = new Button[4];
 		buttonList[0] = new Button(680,20, 100, 50, "Back", "gotoMainMenu", false);
 		buttonList[1] = new Button(680,200, 100, 50, "Edit Tile", "gotoEdit", false);
-		buttonList[2] = new Button(600,90, 50, 50, "Up", "gotoMainMenu", false);
-		buttonList[3] = new Button(600,160, 50, 50, "Down", "gotoMainMenu", false);
+		buttonList[2] = new Button(600,90, 50, 50, "Up", "scrollUp", false);
+		buttonList[3] = new Button(600,160, 50, 50, "Down", "scrollDown", false);
 		tileButtons = new Button[numberOfSavedTiles];
 		for(int i = 0; i < numberOfSavedTiles; i++) {
-			tileButtons[i] = new Button(50+53*(i%10),100+53*(i/10), 40, 40, "", "clickTile", false);
+			System.out.println("i = " + i);
+			tileButtons[i] = new Button(50+53*(i%9),100+53*(i/9), 40, 40, "", "clickTile", false);
 			tileButtons[i].tileSpot = i;
 		}
-		//nameFieldActive = true;
 		nameFieldActive = false;
 	}
 	
@@ -257,8 +227,8 @@ public class TilePanel extends JPanel implements Runnable, KeyListener, MouseLis
 			xOffset = i%8 * 6;
 			yOffset = (int)i/8 * 6;
 			
-			tileX = 50+53*(k%10) + xOffset;
-			tileY = 100+53*(k/10) + yOffset;
+			tileX = 50+53*(k%9) + xOffset;
+			tileY = 100+53*(k/9)-53*scrollBarRow + yOffset;
 			
 
 			
@@ -283,36 +253,9 @@ public class TilePanel extends JPanel implements Runnable, KeyListener, MouseLis
 			savedTileNames[editTileIndex] = nameFieldText;
 			nameFieldText = "";
 			savedTiles[editTileIndex] = temp;
-			if(state == 4) numberOfSavedTiles++;
+			if(state == 4) numberOfSavedTiles++; // Only increments if creating new tile. Doesn't increment if editing existing tile.
 			
-			JSONObject obj = new JSONObject();
-			JSONArray list;
-			for(int i = 0; i < numberOfSavedTiles; i++) {
-				list = new JSONArray();
-				for(int j = 0; j < 64; j++) {
-					list.put(savedTiles[i].getPixel(j));
-				}
-				obj.put(savedTileNames[i], list);
-			}
-			
-			json.writeToFile(obj);
-			
-			/*
-			JSONObject obj = new JSONObject();
-			
-			obj.put("name", "Abhishek Sharma");
-			obj.put("department","B.E");
-			obj.put("branch", "C.S.E");
-			obj.put("year", 3);
-
-			JSONArray list = new JSONArray();
-			
-			list.put("remark 1");
-			list.put("remark 2");
-			list.put("remark 3");
-			
-			obj.put("remarks", list);//adding the list to our JSON Object
-			*/
+			writeToFile();
 		}
 	}
 	
@@ -363,8 +306,60 @@ public class TilePanel extends JPanel implements Runnable, KeyListener, MouseLis
 		else if(action == "paint") {
 			activeButton.color = selectedColor;
 		}
+		else if(action == "scrollDown") {
+			scrollBarRow++;
+		}
+		else if(action == "scrollUp") {
+			if(scrollBarRow > 0) scrollBarRow--;
+		}
 	}
 	
+	// Read From File
+	private void readFromFile() {
+
+		JSONObject json = jsonReadWrite.readFromFile("./tiles.json");
+		Iterator<String> keys = json.keys();
+		Tile tile = new Tile();
+		JSONArray jsonArray = new JSONArray();
+		int[] temp1;
+		byte[] temp2;
+		
+		while(keys.hasNext()) {
+			String key = keys.next();
+			if(json.get(key) instanceof JSONArray) {
+				savedTileNames[numberOfSavedTiles] = (String) key;
+				jsonArray = (JSONArray) json.get(key);
+				
+				temp1 = new int[64];
+				temp2 = new byte[64];
+				
+				for(int i = 0; i < 64; i++) {
+					temp1[i] = (int) jsonArray.get(i);
+					temp2[i] = (byte) temp1[i];
+				}
+				
+				tile = new Tile(temp2);
+				savedTiles[numberOfSavedTiles] = tile;
+				numberOfSavedTiles++;
+			}
+		}
+	}
+	
+	// Write To File
+	private void writeToFile() {
+		JSONObject obj = new JSONObject();
+		JSONArray list;
+		for(int i = numberOfSavedTiles - 1; i >= 0; i--) {
+			list = new JSONArray();
+			for(int j = 0; j < 64; j++) {
+				list.put(savedTiles[i].getPixel(j));
+			}
+			obj.put(savedTileNames[i], list);
+		}
+		
+		jsonReadWrite.writeToFile(obj, "./tiles.json");
+	}
+
 	//----- Rendering -----\\
 	
 	// Update method is empty
@@ -396,23 +391,23 @@ public class TilePanel extends JPanel implements Runnable, KeyListener, MouseLis
 		
 		switch(state) {
 			case 2: { // Saved Tiles
-				//g2d.setColor(Color.white);
 				g2d.setColor(new Color(185, 122, 87)); // Brown
 				g2d.fillRect(30,90,540,500);
 				
 				
 				g2d.setColor(Color.LIGHT_GRAY);
 				g2d.drawString(nameFieldText, 20, 20);
-				//g2d.fillRect(600,90,30,500);
 				
 				for(int i = 0; i < numberOfSavedTiles; i++) {
-					drawTileOnEdit(g2d, i);
-					if(selectedTile == i) {
-						g2d.setColor(Color.green);
-					} else {
-						g2d.setColor(Color.black);
-					}
-					g2d.drawRect(tileButtons[i].x - 2, tileButtons[i].y - 2, 50, 50);
+					//if(i >= 9*scrollBarRow) {
+						drawTileOnEdit(g2d, i);
+						if(selectedTile == i) {
+							g2d.setColor(Color.green);
+						} else {
+							g2d.setColor(Color.black);
+						}
+						g2d.drawRect(tileButtons[i].x - 2, tileButtons[i].y - 2, 50, 50);
+					//}
 				}
 				break;
 			}
@@ -516,16 +511,16 @@ public class TilePanel extends JPanel implements Runnable, KeyListener, MouseLis
 			}
 		} else if(state == 2) { // Saved Tile Page
 			Button b;
+			System.out.println("HERE2");
 			for(int i = 0; i < tileButtons.length; i++) {
 				b = tileButtons[i];
-			//for(Button b : tileButtons) {
 				if(x > b.x && x < b.x + b.w && y > b.y && y < b.y + b.h) {
 					System.out.println("Tile " + b.tileSpot + " was clicked");
 					b.pressed = true;
 					activeButton = b;
 					nameFieldText = savedTileNames[i];
 				}
-			}
+			} 
 		}
 	}
 

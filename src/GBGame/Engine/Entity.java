@@ -1,10 +1,11 @@
 package GBGame.Engine;
 
 public class Entity {
-
+	
+	// Variables \\
 	private String spriteType = "Default";
 	private Sprite spriteSheet[];
-	private byte[][] stateTable;
+	private int[][] stateTable;
 	
 	private double x = 40.0; // Coordinates
 	private double y = 40.0;
@@ -15,18 +16,19 @@ public class Entity {
 	private boolean stateChanged = false; // If the state changed this frame, check and update things.
 	private boolean frameDone = false;
 	private int spriteState = 2; // INT that represents the index for which sprite is active.
-	private byte frameCountdown = 0;
+	private int frameCountdown = 0;
 	private String name = "potato";
 	
 	private int width, height; // Measured in tiles. Each tile is 8x8 pixels.
 	private int direction; // I'll make this an enum later. 0123 = NESW
 	
+	// Constructor \\
 	public Entity(String spriteType, Sprite[] spriteSheet) {
 		System.out.println(this.name);
 		this.spriteType = spriteType;
 		this.spriteSheet = spriteSheet;
 		if(spriteType == "Player") {
-			stateTable = new byte[12][6];
+			stateTable = new int[12][6];
 			
 			/* The left index is just the state number
 			 * The right index is the different properties.
@@ -34,7 +36,7 @@ public class Entity {
 			 * 0 = Action (wait, move, etc)
 			 * 1 = Direction (0-N, 1-E, 2-S, 3-W)
 			 * 2 = Frame Delay (Number of frames to countdown before changing state)
-			 * 3 = Next State (Once frame delay is done, this is indicates the next state to switch to)
+			 * 3 = Next State (Once frame delay is done, this indicates the next state to switch to)
 			 * 4 = Flip (0 for false, 1 for true. Is the sprite using a flipped version of an existing sprite?)
 			 * 5 = Sprite (The index for which sprite is being used from the Sprite Sheet)
 			 */
@@ -127,20 +129,31 @@ public class Entity {
 		}
 	}
 	
+	// Getters \\
 	public String getSpriteType() { return spriteType; }
+	
 	public Sprite getSprite(int x) {
 		return spriteSheet[x];
 	}
+	
 	public double getX() { return x; }
+	
 	public double getY() { return y; }
+	
 	public int getWidth() { return width; }
+	
 	public int getHeight() { return height; }
+	
 	public int getSpriteState() {
 		//return spriteState;
 		return (int)stateTable[spriteState][5];
 	}
+	
 	public boolean changed() { return stateChanged; }
-	public byte getFrameCountdown() { return frameCountdown; }
+	
+	public int getFrameCountdown() { return frameCountdown; }
+	
+	// Entity Methods \\
 	public void decrementFrameCountdown() {
 		if(frameCountdown != -1) {
 			//System.out.println(frameCountdown);
@@ -153,7 +166,7 @@ public class Entity {
 	
 	public void updateSprite() {
 		// Need to check if moving or still, and which direction.
-		//System.out.println("Sprite State = " + spriteState);
+		//System.out.println("Sprite State = " + spriteState);axlk
 		//if(frameDone && !stateChanged) {
 		
 		if(stateChanged) {
@@ -202,6 +215,7 @@ public class Entity {
 		frameDone = false;
 	}
 	
+	// Movement Methods \\
 	public void accelerate(double dx, double dy) {
 		if(this.dx == 0.0 && this.dy == 0.0) {
 			moving = true;
