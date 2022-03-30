@@ -106,6 +106,6 @@ public class Button {
 		if(pressed) g2d.setColor(Color.yellow);
 		else g2d.setColor(Color.white);
 		
-		g2d.drawString(text, x+w/2-10, y+h/2+3);
+		g2d.drawString(text, x+w/2-3*text.length()-5, y+h/2+3);
 	}
 }

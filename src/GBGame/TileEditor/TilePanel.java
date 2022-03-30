@@ -130,11 +130,13 @@ public class TilePanel extends JPanel implements Runnable, KeyListener, MouseLis
 		//state = "MainMenu";
 		state = 1;
 		
-		buttonList = new Button[3];
+		buttonList = new Button[5];
 		tileColors = new Button[64];
-		buttonList[0] = new Button(100,350, 100, 50, "Create", "gotoCreate", false);
-		buttonList[1] = new Button(300,350, 100, 50, "View Saved", "gotoSaved", false);
-		buttonList[2] = new Button(500,350, 100, 50, "Leave", "Leave", false);
+		buttonList[0] = new Button(100,150, 100, 50, "Create Tile", "gotoCreate", false);
+		buttonList[1] = new Button(100,230, 130, 50, "View Saved Tiles", "gotoSaved", false);
+		buttonList[2] = new Button(100,310, 100, 50, "New Sprite", "gotoMakeSprite", false);
+		buttonList[3] = new Button(100,390, 150, 50, "View Saved Sprites", "gotoSavedSprites", false);
+		buttonList[4] = new Button(100,470, 100, 50, "Leave", "Leave", false);
 		nameFieldActive = false;
 	}
 	
@@ -210,6 +212,19 @@ public class TilePanel extends JPanel implements Runnable, KeyListener, MouseLis
 		colorSelection[4] = new Button(600, 500, 40, 40, "", "color 4", false); // Transparent
 	}
 	
+	// Create New Sprite Screen
+	private void makeCreateSpriteScreen() {
+		state = 5;
+		buttonList = new Button[1];
+		buttonList[0] = new Button(680, 20, 100, 50, "Back", "gotoMainMenu", false);
+	}
+	// View Saved Sprites Screen
+	private void makeSavedSpritesScreen() {
+		state = 6;
+		buttonList = new Button[1];
+		buttonList[0] = new Button(680, 20, 100, 50, "Back", "gotoMainMenu", false);
+		
+	}
 	//----- Methods -----\\
 	
 	// Method that draws the tiles in the saved view page
@@ -280,6 +295,14 @@ public class TilePanel extends JPanel implements Runnable, KeyListener, MouseLis
 				editTileIndex = selectedTile;
 				makeEditTileScreen();
 			}
+		}
+		else if(action == "gotoMakeSprite") {
+			System.out.println("Trying to create new sprite.");
+			makeCreateSpriteScreen();
+		}
+		else if(action == "gotoSavedSprites") {
+			System.out.println("Trying to view saved sprites.");
+			makeSavedSpritesScreen();
 		}
 		else if(action == "Save") {
 			saveTile();
@@ -390,6 +413,14 @@ public class TilePanel extends JPanel implements Runnable, KeyListener, MouseLis
 		}
 		
 		switch(state) {
+			case 1: {
+				g2d.drawString("Graphics Editor - Main Menu", 50, 50);
+				g2d.drawString("Draw a new 8x8 tile.", 230, 175);
+				g2d.drawString("View saved tiles and edit them.", 260, 255);
+				g2d.drawString("Create new sprite from gallery of existing tiles.", 230, 335);
+				g2d.drawString("View saved sprites and edit them.", 280, 415);
+				break;
+			}
 			case 2: { // Saved Tiles
 				g2d.setColor(new Color(185, 122, 87)); // Brown
 				g2d.fillRect(30,90,540,500);

@@ -71,10 +71,11 @@ public class GameManager {
 			}
 		}
 	}
+	
 	private void createTiles(){
 		// Creates Background Tile (the smiley face)
 		byte tile1[] = new byte[64];
-		//Arrays.fill(tile1, 1); // Default filling the array with dark grey pixels. Followed by filling in specific elements with the colors to make the face.
+		// Default filling the array with dark grey pixels. Followed by filling in specific elements with the colors to make the face.
 		for(int i = 0; i < tile1.length; i++) {
 			tile1[i] = 1;
 		}
@@ -223,13 +224,17 @@ public class GameManager {
 	public byte[] getBackgroundLayer() {
 		return BackgroundLayer;
 	}
+	
 	public Entity[] getEntityLayer() {
 		return EntityLayer;
 	}
+	
 	public Sprite[] getSpriteLayer(){
 		return SpriteLayer;
 	}
+	
 	public Sprite[] getWindowLayer() {
 		return WindowLayer;
 	}
+
 }

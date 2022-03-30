@@ -121,11 +121,11 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 		tileSet = gameManager.getTileSet();
 		//readFileData();
 		
-		
 		BackgroundLayer = gameManager.getBackgroundLayer();
 		EntityLayer = gameManager.getEntityLayer();
 		WindowLayer = gameManager.getWindowLayer();
 	}
+	
 	/*
 	private void readFileData() {
 		JSONObject json = jsonReadWrite.readFromFile("./tiles.json");
@@ -158,6 +158,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener{
 		}
 	}
 	*/
+	
 	private void setColorPallete() { // I have one color pallete for testing. More coming later...
 		switch(chosenPallete) {
 			//case  0: colorPalette[0] = Color.black; colorPalette[1] = Color.DARK_GRAY; colorPalette[2] = Color.LIGHT_GRAY; colorPalette[3] = Color.red; break;
